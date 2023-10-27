@@ -214,6 +214,10 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
+  {
+    'stevearc/conform.nvim',
+    opts = {},
+  },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -440,11 +444,6 @@ local on_attach = function(_, bufnr)
   nmap('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
-
-  -- Create a command `:Format` local to the LSP buffer
-  -- vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-  --   vim.lsp.buf.format()
-  -- end, { desc = 'Format current buffer with LSP' })
 end
 
 -- document existing key chains
@@ -559,6 +558,25 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+require('conform').setup {
+  formatters_by_ft = {
+    lua = { 'stylua' },
+    javascript = { { 'prettierd', 'prettier' } },
+  },
+}
+
+vim.api.nvim_create_user_command('Format', function(args)
+  local range = nil
+  if args.count ~= -1 then
+    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    range = {
+      start = { args.line1, 0 },
+      ['end'] = { args.line2, end_line:len() },
+    }
+  end
+  require('conform').format { async = true, lsp_fallback = true, range = range }
+end, { range = true, desc = 'Format current buffer with LSP' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
