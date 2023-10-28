@@ -9,6 +9,12 @@ return {
       typescript = { { 'prettierd', 'prettier' } },
       javascriptreact = { { 'prettierd', 'prettier' } },
       typescriptreact = { { 'prettierd', 'prettier' } },
+      svelte = { { 'prettierd', 'prettier' } },
+      css = { { 'prettierd', 'prettier' } },
+      html = { { 'prettierd', 'prettier' } },
+      json = { { 'prettierd', 'prettier' } },
+      yaml = { { 'prettierd', 'prettier' } },
+      markdown = { { 'prettierd', 'prettier' } },
     },
   },
   config = function()
