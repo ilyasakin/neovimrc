@@ -214,7 +214,7 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-  require 'kickstart.plugins.format'
+  require '0x000000.plugins.format'
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
