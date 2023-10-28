@@ -1,5 +1,7 @@
 return {
   'stevearc/conform.nvim',
+  lazy = true,
+  event = { "BufReadPre", "BufNewFile" }, -- to disable, comment this out
   opts = {
     formatters_by_ft = {
       lua = { 'stylua' },
