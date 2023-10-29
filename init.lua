@@ -107,6 +107,9 @@ require('lazy').setup({
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
     },
+    opts = function(_, opts)
+
+    end
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -214,7 +217,9 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-  require '0x000000.plugins.format'
+  require '0x000000.plugins.format',
+  require '0x000000.plugins.copilot',
+  require '0x000000.plugins.copilot-cmp'
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -552,6 +557,7 @@ cmp.setup {
     end, { 'i', 's' }),
   },
   sources = {
+    { name = 'copilot' },
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   },
