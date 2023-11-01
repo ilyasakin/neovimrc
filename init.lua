@@ -35,8 +35,6 @@ P.S. You can delete this when you're done too. It's your config now :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-vim.g.coq_settings = { auto_start = 'shut-up' }
-
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -85,6 +83,25 @@ require('lazy').setup({
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
     },
+  },
+
+{
+    -- Autocompletion
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+      -- Snippet Engine & its associated nvim-cmp source
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
+
+      -- Adds LSP completion capabilities
+      'hrsh7th/cmp-nvim-lsp',
+
+      -- Adds a number of user-friendly snippets
+      'rafamadriz/friendly-snippets',
+    },
+    opts = function(_, opts)
+
+    end
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -224,32 +241,6 @@ require('lazy').setup({
   },
 
   {
-
-    'ms-jpq/coq_nvim',
-    branch = 'coq',
-    -- Main plugin
-
-  },
-  {
-    'ms-jpq/coq.artifacts',
-    branch = 'artifacts',
-  },
-
-  {
-    'ms-jpq/coq.thirdparty',
-    branch = '3p',
-    dependencies = {
-      'github/copilot.vim'
-    },
-    config = function()
-      require("coq_3p") {
-        { src = "copilot", short_name = "COP",  accept_key = "<c-f>" },
-        { src = "nvimlua", short_name = "nLUA", conf_only = true }
-      }
-    end
-  },
-
-  {
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
@@ -263,11 +254,11 @@ require('lazy').setup({
       },
       -- you can enable a preset for easier configuration
       presets = {
-        bottom_search = true,     -- use a classic bottom cmdline for search
-        command_palette = true,   -- position the cmdline and popupmenu together
+        bottom_search = true,         -- use a classic bottom cmdline for search
+        command_palette = true,       -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = false,       -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = false,   -- add a border to hover docs and signature help
+        inc_rename = false,           -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false,       -- add a border to hover docs and signature help
       },
     },
     dependencies = {
@@ -281,8 +272,8 @@ require('lazy').setup({
   },
 
   require '0x000000.plugins.format',
-  -- require '0x000000.plugins.copilot',
-  -- require '0x000000.plugins.copilot-cmp'
+  require '0x000000.plugins.copilot',
+  require '0x000000.plugins.copilot-cmp'
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -592,7 +583,7 @@ local servers = {
     }
   },
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
+  cssls = { filetypes = { 'css', 'scss', 'less', 'sass' } },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -606,7 +597,7 @@ local servers = {
 require('neodev').setup()
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require 'coq'.lsp_ensure_capabilities(capabilities)
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
@@ -628,52 +619,52 @@ mason_lspconfig.setup_handlers {
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
--- local cmp = require 'cmp'
--- local luasnip = require 'luasnip'
--- require('luasnip.loaders.from_vscode').lazy_load()
--- luasnip.config.setup {}
+local cmp = require 'cmp'
+local luasnip = require 'luasnip'
+require('luasnip.loaders.from_vscode').lazy_load()
+luasnip.config.setup {}
 --
--- cmp.setup {
---   snippet = {
---     expand = function(args)
---       luasnip.lsp_expand(args.body)
---     end,
---   },
---   mapping = cmp.mapping.preset.insert {
---     ['<C-n>'] = cmp.mapping.select_next_item(),
---     ['<C-p>'] = cmp.mapping.select_prev_item(),
---     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
---     ['<C-f>'] = cmp.mapping.scroll_docs(4),
---     ['<C-Space>'] = cmp.mapping.complete {},
---     ['<CR>'] = cmp.mapping.confirm {
---       behavior = cmp.ConfirmBehavior.Replace,
---       select = true,
---     },
---     ['<Tab>'] = cmp.mapping(function(fallback)
---       if cmp.visible() then
---         cmp.select_next_item()
---       elseif luasnip.expand_or_locally_jumpable() then
---         luasnip.expand_or_jump()
---       else
---         fallback()
---       end
---     end, { 'i', 's' }),
---     ['<S-Tab>'] = cmp.mapping(function(fallback)
---       if cmp.visible() then
---         cmp.select_prev_item()
---       elseif luasnip.locally_jumpable(-1) then
---         luasnip.jump(-1)
---       else
---         fallback()
---       end
---     end, { 'i', 's' }),
---   },
---   sources = {
---     { name = 'copilot' },
---     { name = 'nvim_lsp' },
---     { name = 'luasnip' },
---   },
--- }
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert {
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete {},
+    ['<CR>'] = cmp.mapping.confirm {
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    },
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_locally_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.locally_jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+  },
+  sources = {
+    { name = 'copilot' },
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
