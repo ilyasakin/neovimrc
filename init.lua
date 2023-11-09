@@ -86,7 +86,7 @@ require('lazy').setup({
     },
   },
 
-{
+  {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -397,6 +397,8 @@ vim.defer_fn(function()
     ensure_installed = {
       'c',
       'cpp',
+      'css',
+      'scss',
       'c_sharp',
       'go',
       'lua',
@@ -407,7 +409,27 @@ vim.defer_fn(function()
       'typescript',
       'vimdoc',
       'vim',
-      'bash'
+      'bash',
+      'cmake',
+      'dockerfile',
+      'gomod',
+      'html',
+      'java',
+      'json',
+      'json5',
+      'kotlin',
+      'llvm',
+      'make',
+      'markdown',
+      'markdown_inline',
+      'php',
+      'prisma',
+      'sql',
+      'swift',
+      'vue',
+      'xml',
+      'yaml',
+      'zig',
     },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
