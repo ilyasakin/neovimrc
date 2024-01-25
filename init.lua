@@ -524,7 +524,10 @@ local on_attach = function(client, bufnr)
   end
 
   local navbuddy = require("nvim-navbuddy")
-  navbuddy.attach(client, bufnr)
+
+  if client.server_capabilities.documentSymbolProvider then
+    navbuddy.attach(client, bufnr)
+  end
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
