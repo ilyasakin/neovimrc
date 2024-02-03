@@ -81,7 +81,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -315,6 +315,7 @@ require('lazy').setup({
       "rcarriga/nvim-notify",
     }
   },
+  { 'jmederosalvarado/roslyn.nvim' },
 
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
@@ -732,9 +733,11 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
+local lspconfig = require 'lspconfig'
+
 mason_lspconfig.setup_handlers {
   function(server_name)
-    require('lspconfig')[server_name].setup {
+    lspconfig[server_name].setup {
       capabilities = capabilities,
       on_attach = on_attach,
       settings = servers[server_name],
@@ -742,6 +745,11 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
+
+require("roslyn").setup({
+  on_attach = on_attach,
+  capabilities = capabilities
+});
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
