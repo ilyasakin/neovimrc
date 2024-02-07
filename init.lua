@@ -259,8 +259,16 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
+      'windwp/nvim-ts-autotag',
     },
     build = ':TSUpdate',
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        autotag = {
+          enable = true,
+        },
+      })
+    end
   },
 
   {
@@ -316,7 +324,11 @@ require('lazy').setup({
     }
   },
   { 'jmederosalvarado/roslyn.nvim' },
-
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    opts = {} -- this is equalent to setup({}) function
+  },
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.copilot-cmp'
@@ -803,6 +815,19 @@ cmp.setup {
     { name = 'path' },
   },
 }
+
+
+-- vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
+--   vim.lsp.diagnostic.on_publish_diagnostics,
+--   {
+--     underline = true,
+--     virtual_text = {
+--       spacing = 5,
+--       severity_limit = 'Warning',
+--     },
+--     update_in_insert = true,
+--   }
+-- )
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
