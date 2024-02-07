@@ -829,5 +829,17 @@ cmp.setup {
 --   }
 -- )
 
+local wr_group = vim.api.nvim_create_augroup('WinResize', { clear = true })
+
+vim.api.nvim_create_autocmd(
+  'VimResized',
+  {
+    group = wr_group,
+    pattern = '*',
+    command = 'wincmd =',
+    desc = 'Automatically resize windows when the host window size changes.'
+  }
+)
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
