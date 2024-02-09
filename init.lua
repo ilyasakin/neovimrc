@@ -275,6 +275,9 @@ require('lazy').setup({
     build = ':TSUpdate',
     config = function()
       require("nvim-treesitter.configs").setup({
+        highlight = {
+          enable = true,
+        },
         autotag = {
           enable = true,
         },
