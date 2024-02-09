@@ -278,6 +278,9 @@ require('lazy').setup({
         autotag = {
           enable = true,
         },
+        indent = {
+          enable = true,
+        },
       })
     end
   },
