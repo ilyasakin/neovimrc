@@ -355,6 +355,12 @@ require('lazy').setup({
     event = "InsertEnter",
     opts = {} -- this is equalent to setup({}) function
   },
+  { 'LunarVim/bigfile.nvim' },
+  {
+    'f-person/git-blame.nvim',
+    event = 'VeryLazy',
+    opts = {} -- this is equalent to setup({}) function
+  },
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.copilot-cmp'
