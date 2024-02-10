@@ -876,8 +876,10 @@ vim.api.nvim_create_autocmd(
 -- Enable filetype.lua, which supposed to enhance performance? Idk
 vim.g.do_filetype_lua = 1;
 vim.opt.swapfile = false;
+vim.opt.backup = false;
 vim.opt.wrap = false;
 vim.opt.guicursor = '';
+vim.opt.scrolloff = 4;
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
