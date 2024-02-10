@@ -879,6 +879,8 @@ vim.api.nvim_create_autocmd(
     desc = 'Automatically resize windows when the host window size changes.'
   }
 )
+
+require '0x000000.ps'
 -- let g:do_filetype_lua = 1
 -- Enable filetype.lua, which supposed to enhance performance? Idk
 vim.g.do_filetype_lua = 1;

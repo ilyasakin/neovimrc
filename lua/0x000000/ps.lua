@@ -9,5 +9,9 @@ local opts = {
 	sorter = sorters.get_generic_fuzzy_sorter(),
 }
 
-local picker = pickers.new(opts);
-picker:find()
+vim.api.nvim_create_user_command('Ps',
+	function()
+		local picker = pickers.new(opts);
+		picker:find()
+	end,
+	{})
