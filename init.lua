@@ -361,6 +361,13 @@ require('lazy').setup({
     event = 'VeryLazy',
     opts = {} -- this is equalent to setup({}) function
   },
+  {
+    'sindrets/diffview.nvim',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+  },
+
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.copilot-cmp'
