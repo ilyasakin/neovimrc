@@ -776,9 +776,11 @@ local servers = {
 -- Setup neovim lua configuration
 require('neodev').setup()
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
--- Disable snippet support, once and for all. Annoying!
+local capabilities = vim.tbl_deep_extend("force",
+  vim.lsp.protocol.make_client_capabilities(),
+  require('cmp_nvim_lsp').default_capabilities()
+)
+capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
 capabilities.textDocument.completion.completionItem.snippetSupport = false
 
 -- Ensure the servers above are installed
