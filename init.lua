@@ -66,7 +66,7 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
-  -- 'tpope/vim-fugitive',
+'tpope/vim-fugitive',
   -- 'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
@@ -419,7 +419,7 @@ vim.o.smartcase = true
 vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 50
+vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
@@ -891,6 +891,7 @@ vim.opt.backup = false;
 vim.opt.wrap = false;
 vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
