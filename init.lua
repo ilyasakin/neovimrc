@@ -130,9 +130,11 @@ require('lazy').setup({
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',  opts = {} },
+  { 'airblade/vim-gitgutter' },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    enabled = false,
     opts = {
       -- See `:help gitsigns.txt`
       signs = {
@@ -251,7 +253,10 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    'numToStr/Comment.nvim',
+    opts = {}
+  },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -893,6 +898,15 @@ vim.opt.wrap = false;
 vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
 vim.cmd [[set diffopt+=linematch:50]]
+
+-- Set gitgutter mappings
+-- These are defaults. Added for whichkey descriptions
+vim.keymap.set('n', '<leader>hp', ':GitGutterPreviewHunk<CR>', { desc = 'Preview git hunk' })
+vim.keymap.set('n', '<leader>hs', ':GitGutterStageHunk<CR>', { desc = 'Stage git hunk' })
+vim.keymap.set('n', '<leader>hr', ':GitGutterResetHunk<CR>', { desc = 'Reset git hunk' })
+-- Next hunk
+vim.keymap.set('n', ']c', ':GitGutterNextHunk<CR>', { desc = 'Jump to next git hunk' })
+vim.keymap.set('n', '[c', ':GitGutterPrevHunk<CR>', { desc = 'Jump to previous git hunk' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
