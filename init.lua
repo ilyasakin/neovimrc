@@ -287,27 +287,13 @@ require('lazy').setup({
       'windwp/nvim-ts-autotag',
     },
     build = ':TSUpdate',
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false
-        },
-        autotag = {
-          enable = true,
-        },
-        indent = {
-          enable = true,
-        },
-      })
-    end
   },
 
   {
     'Wansmer/symbol-usage.nvim',
     event = 'LspAttach', -- need run before LspAttach if you use nvim 0.9. On 0.10 use 'LspAttach'
     config = function()
-      require('symbol-usage').setup()
+      require('symbol-usage').setup({})
     end
   },
 
@@ -593,8 +579,16 @@ vim.defer_fn(function()
     ignore_install = {},
     -- You can specify additional Treesitter modules here: -- For example: -- playground = {--enable = true,-- },
     modules = {},
-    highlight = { enable = true },
-    indent = { enable = true },
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false
+    },
+    autotag = {
+      enable = true,
+    },
+    indent = {
+      enable = true,
+    },
     incremental_selection = {
       enable = true,
       keymaps = {
