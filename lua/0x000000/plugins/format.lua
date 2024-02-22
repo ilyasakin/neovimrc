@@ -1,26 +1,30 @@
 return {
-  'stevearc/conform.nvim',
-  lazy = true,
-  event = { "BufReadPre", "BufNewFile" }, -- to disable, comment this out
+  "stevearc/conform.nvim",
+  event = { "BufWritePre" },
+  cmd = { "ConformInfo" },
+  -- Everything in opts will be passed to setup()
   opts = {
+    -- Define your formatters
     formatters_by_ft = {
-      lua = { 'stylua' },
-      javascript = { { 'prettierd', 'prettier' } },
-      typescript = { { 'prettierd', 'prettier' } },
-      javascriptreact = { { 'prettierd', 'prettier' } },
-      typescriptreact = { { 'prettierd', 'prettier' } },
-      svelte = { { 'prettierd', 'prettier' } },
-      css = { { 'prettierd', 'prettier' } },
-      html = { { 'prettierd', 'prettier' } },
-      json = { { 'prettierd', 'prettier' } },
-      yaml = { { 'prettierd', 'prettier' } },
-      markdown = { { 'prettierd', 'prettier' } },
-      cs = { 'csharpier' }
+      ["javascript"] = { "prettierd", "prettier" },
+      ["javascriptreact"] = { "prettierd", "prettier" },
+      ["typescript"] = { "prettierd", "prettier" },
+      ["typescriptreact"] = { "prettierd", "prettier" },
+      ["vue"] = { "prettierd", "prettier" },
+      ["css"] = { "prettierd", "prettier" },
+      ["scss"] = { "prettierd", "prettier" },
+      ["less"] = { "prettierd", "prettier" },
+      ["html"] = { "prettierd", "prettier" },
+      ["json"] = { "prettierd", "prettier" },
+      ["jsonc"] = { "prettierd", "prettier" },
+      ["yaml"] = { "prettierd", "prettier" },
+      ["markdown"] = { "prettierd", "prettier" },
+      ["markdown.mdx"] = { "prettierd", "prettier" },
+      ["graphql"] = { "prettierd", "prettier" },
+      ["handlebars"] = { "prettierd", "prettier" },
     },
   },
-  config = function()
-    require('conform').setup {}
-
+  init = function()
     vim.api.nvim_create_user_command('Format', function(args)
       local range = nil
       if args.count ~= -1 then
