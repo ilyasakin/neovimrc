@@ -66,7 +66,7 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
-'tpope/vim-fugitive',
+  'tpope/vim-fugitive',
   -- 'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
@@ -286,6 +286,7 @@ require('lazy').setup({
       require("nvim-treesitter.configs").setup({
         highlight = {
           enable = true,
+          additional_vim_regex_highlighting = false
         },
         autotag = {
           enable = true,
@@ -299,7 +300,7 @@ require('lazy').setup({
 
   {
     'Wansmer/symbol-usage.nvim',
-    event = 'BufReadPre', -- need run before LspAttach if you use nvim 0.9. On 0.10 use 'LspAttach'
+    event = 'LspAttach', -- need run before LspAttach if you use nvim 0.9. On 0.10 use 'LspAttach'
     config = function()
       require('symbol-usage').setup()
     end
@@ -891,7 +892,7 @@ vim.opt.backup = false;
 vim.opt.wrap = false;
 vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
-
+vim.cmd [[set diffopt+=linematch:50]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
