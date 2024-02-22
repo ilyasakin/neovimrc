@@ -652,12 +652,6 @@ local on_attach = function(client, bufnr)
     vim.lsp.inlay_hint.enable(bufnr, true)
   end
 
-  local navbuddy = require("nvim-navbuddy")
-
-  if client.server_capabilities.documentSymbolProvider then
-    navbuddy.attach(client, bufnr)
-  end
-
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', function()
     vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
