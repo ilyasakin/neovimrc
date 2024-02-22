@@ -742,7 +742,7 @@ local servers = {
         includeInlayFunctionParameterTypeHints = true,
         includeInlayParameterNameHints = 'all',
         includeInlayParameterNameHintsWhenArgumentMatchesName = true, -- false
-        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = false,
         includeInlayVariableTypeHints = true,
         includeInlayVariableTypeHintsWhenTypeMatchesName = true -- false
       },
@@ -754,7 +754,7 @@ local servers = {
         includeInlayFunctionParameterTypeHints = true,
         includeInlayParameterNameHints = 'all',
         includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = false,
         includeInlayVariableTypeHints = true,
         includeInlayVariableTypeHintsWhenTypeMatchesName = true
       },
