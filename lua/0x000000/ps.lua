@@ -2,7 +2,7 @@ local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
 
-local input = { 'ps', 'aux' }
+local input = { 'ps', '-eo', 'comm,pid,args' }
 
 local opts = {
 	finder = finders.new_oneshot_job(input),
