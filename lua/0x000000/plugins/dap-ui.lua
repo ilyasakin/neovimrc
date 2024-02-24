@@ -57,7 +57,7 @@ return {
       desc = "Toggle UI",
     },
     {
-      "<leader>dc",
+      "<leader>dt",
       function()
         require("dapui").toggle { layout = 2 }
       end,
