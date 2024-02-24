@@ -813,7 +813,7 @@ cmp.setup {
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete {},
-    ['<C-CR>'] = cmp.mapping.confirm {
+    ['<C-y>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
@@ -865,7 +865,6 @@ vim.api.nvim_create_autocmd(
   }
 )
 
-require '0x000000.ps'
 -- let g:do_filetype_lua = 1
 -- Enable filetype.lua, which supposed to enhance performance? Idk
 vim.g.do_filetype_lua = 1;
