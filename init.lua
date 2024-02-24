@@ -349,7 +349,9 @@ require('lazy').setup({
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.copilot-cmp',
-  require '0x000000.plugins.debug'
+  require '0x000000.plugins.dap',
+  require '0x000000.plugins.mason-dap',
+  require '0x000000.plugins.dap-ui'
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
