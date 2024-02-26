@@ -809,6 +809,13 @@ vim.keymap.set('n', '<leader>hr', ':GitGutterResetHunk<CR>', { desc = 'Reset git
 -- Next hunk
 vim.keymap.set('n', ']c', ':GitGutterNextHunk<CR>', { desc = 'Jump to next git hunk' })
 vim.keymap.set('n', '[c', ':GitGutterPrevHunk<CR>', { desc = 'Jump to previous git hunk' })
+-- Fugitive
+vim.keymap.set('n', '<leader>gs', ':G status<CR>', { desc = 'Git [S]tatus' })
+vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git [C]ommit' })
+vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git [P]ush' })
+vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git [L]og' })
+vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git [D]iff' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
