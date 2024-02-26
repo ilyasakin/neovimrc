@@ -284,11 +284,7 @@ require('lazy').setup({
   {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-      -- refer to the configuration section below
-    },
+    opts = {},
   },
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
@@ -824,6 +820,9 @@ vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git [C]ommit' })
 vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git [P]ush' })
 vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git [L]og' })
 vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git [D]iff' })
+
+-- Toggle Trouble
+vim.keymap.set('n', '<leader>tt', ':TroubleToggle<CR>', { desc = 'Toggle [T]rouble' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
