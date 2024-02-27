@@ -379,7 +379,6 @@ vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning"
 vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -805,10 +804,10 @@ vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git [D]iff' })
 vim.keymap.set('n', '<leader>tt', ':TroubleToggle<CR>', { desc = 'Toggle [T]rouble' })
 
 -- Disable -root of all the evil- arrow keys
-vim.keymap.set('n', '<Up>', '<Nop>', { silent = true })
-vim.keymap.set('n', '<Down>', '<Nop>', { silent = true })
-vim.keymap.set('n', '<Left>', '<Nop>', { silent = true })
-vim.keymap.set('n', '<Right>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'i', 'v' }, '<Up>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'i', 'v' }, '<Down>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'i', 'v' }, '<Left>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'i', 'v' }, '<Right>', '<Nop>', { silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
