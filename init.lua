@@ -281,6 +281,11 @@ require('lazy').setup({
     event = 'LspAttach',
     opts = {}
   },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {},
+  },
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.copilot-cmp',
@@ -355,8 +360,23 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+
+-- Next error, previous error
+local diagnostic_goto = function(next, severity)
+  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function()
+    go({ severity = severity })
+  end
+end
+
+vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
+vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
+vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
+vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" })
+vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" })
+vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
+
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
@@ -779,6 +799,15 @@ vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git [C]ommit' })
 vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git [P]ush' })
 vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git [L]og' })
 vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git [D]iff' })
+
+-- Toggle Trouble
+vim.keymap.set('n', '<leader>tt', ':TroubleToggle<CR>', { desc = 'Toggle [T]rouble' })
+
+-- Disable -root of all the evil- arrow keys
+vim.keymap.set('n', '<Up>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Down>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Left>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Right>', '<Nop>', { silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
