@@ -163,8 +163,43 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
-  { 'airblade/vim-gitgutter' },
+  { 'folke/which-key.nvim', opts = {} },
+  {
+    'airblade/vim-gitgutter',
+    event = 'BufRead',
+    keys = {
+      {
+        '<leader>hp',
+        ':GitGutterPreviewHunk<CR>',
+        mode = 'n',
+        desc = '[P]review git hunk',
+      },
+      {
+        '<leader>hs',
+        ':GitGutterStageHunk<CR>',
+        mode = 'n',
+        desc = '[S]tage git hunk',
+      },
+      {
+        '<leader>hu',
+        ':GitGutterUndoHunk<CR>',
+        mode = 'n',
+        desc = '[U]ndo git hunk',
+      },
+      {
+        ']c',
+        ':GitGutterNextHunk<CR>',
+        mode = 'n',
+        desc = 'Jump to [N]ext git hunk',
+      },
+      {
+        '[c',
+        ':GitGutterPrevHunk<CR>',
+        mode = 'n',
+        desc = 'Jump to [P]revious git hunk',
+      },
+    },
+  },
 
   {
     -- Theme inspired by Atom
@@ -180,7 +215,7 @@ require('lazy').setup({
     end,
   },
 
-  { "rose-pine/neovim",            name = "rose-pine" },
+  { "rose-pine/neovim",     name = "rose-pine" },
 
   {
     -- Set lualine as statusline
@@ -315,6 +350,14 @@ require('lazy').setup({
     "folke/trouble.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      {
+        '<leader>tt',
+        ':TroubleToggle<CR>',
+        mode = 'n',
+        desc = 'Toggle [T]rouble'
+      }
+    },
     opts = {},
   },
   require '0x000000.plugins.format',
@@ -814,18 +857,6 @@ vim.opt.wrap = false;
 vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
 vim.cmd [[set diffopt+=linematch:50]]
-
--- Set gitgutter mappings
--- These are defaults. Added for whichkey descriptions
-vim.keymap.set('n', '<leader>hp', ':GitGutterPreviewHunk<CR>', { desc = 'Preview git hunk' })
-vim.keymap.set('n', '<leader>hs', ':GitGutterStageHunk<CR>', { desc = 'Stage git hunk' })
-vim.keymap.set('n', '<leader>hr', ':GitGutterResetHunk<CR>', { desc = 'Reset git hunk' })
--- Next hunk
-vim.keymap.set('n', ']c', ':GitGutterNextHunk<CR>', { desc = 'Jump to next git hunk' })
-vim.keymap.set('n', '[c', ':GitGutterPrevHunk<CR>', { desc = 'Jump to previous git hunk' })
-
--- Toggle Trouble
-vim.keymap.set('n', '<leader>tt', ':TroubleToggle<CR>', { desc = 'Toggle [T]rouble' })
 
 -- Disable -root of all the evil- arrow keys
 vim.keymap.set({ 'n', 'i', 'v' }, '<Up>', '<Nop>', { silent = true })
