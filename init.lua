@@ -73,9 +73,39 @@ require('lazy').setup({
   -- 'tpope/vim-sleuth',
   {
     'Darazaki/indent-o-matic',
-    config = function()
-      require('indent-o-matic').setup {}
-    end,
+    keys = {
+      {
+        '<leader>gs',
+        ':G status<CR>',
+        mode = 'n',
+        desc = 'Git [S]tatus',
+      },
+      {
+        '<leader>gc',
+        ':G commit<CR>',
+        mode = 'n',
+        desc = 'Git [C]ommit',
+      },
+      {
+        '<leader>gp',
+        ':G push<CR>',
+        mode = 'n',
+        desc = 'Git [P]ush',
+      },
+      {
+        '<leader>gl',
+        ':G log<CR>',
+        mode = 'n',
+        desc = 'Git [L]og',
+      },
+      {
+        '<leader>gd',
+        ':Gvdiffsplit<CR>',
+        mode = 'n',
+        desc = 'Git [D]iff',
+      },
+    },
+    opts = {},
   },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
@@ -793,12 +823,6 @@ vim.keymap.set('n', '<leader>hr', ':GitGutterResetHunk<CR>', { desc = 'Reset git
 -- Next hunk
 vim.keymap.set('n', ']c', ':GitGutterNextHunk<CR>', { desc = 'Jump to next git hunk' })
 vim.keymap.set('n', '[c', ':GitGutterPrevHunk<CR>', { desc = 'Jump to previous git hunk' })
--- Fugitive
-vim.keymap.set('n', '<leader>gs', ':G status<CR>', { desc = 'Git [S]tatus' })
-vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git [C]ommit' })
-vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git [P]ush' })
-vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git [L]og' })
-vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git [D]iff' })
 
 -- Toggle Trouble
 vim.keymap.set('n', '<leader>tt', ':TroubleToggle<CR>', { desc = 'Toggle [T]rouble' })
