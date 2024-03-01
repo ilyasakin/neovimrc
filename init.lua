@@ -833,6 +833,10 @@ vim.keymap.set({ 'n', 'i', 'v' }, '<Down>', '<Nop>', { silent = true })
 vim.keymap.set({ 'n', 'i', 'v' }, '<Left>', '<Nop>', { silent = true })
 vim.keymap.set({ 'n', 'i', 'v' }, '<Right>', '<Nop>', { silent = true })
 
+vim.fn.sign_define('DiagnosticSignError', { text = '!', texthl = 'DiagnosticSignError' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = '!', texthl = 'DiagnosticSignWarn' })
+vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignInfo' })
+vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignHint' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 --
