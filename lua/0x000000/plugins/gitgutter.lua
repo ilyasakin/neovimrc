@@ -33,4 +33,7 @@ return {
       desc = 'Jump to [P]revious git hunk',
     },
   },
+  config = function()
+    vim.g.gitgutter_sign_priority = 0
+  end,
 };
