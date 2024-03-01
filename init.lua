@@ -788,18 +788,22 @@ cmp.setup {
   },
 }
 
-
--- vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
---   vim.lsp.diagnostic.on_publish_diagnostics,
---   {
---     underline = true,
---     virtual_text = {
---       spacing = 5,
---       severity_limit = 'Warning',
---     },
---     update_in_insert = true,
---   }
--- )
+vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics,
+  {
+    underline = {
+      severity = { min = vim.diagnostic.severity.ERROR }
+    },
+    signs = {
+      severity = { min = vim.diagnostic.severity.ERROR }
+    },
+    virtual_text = {
+      spacing = 5,
+      severity = { min = vim.diagnostic.severity.ERROR }
+    },
+    update_in_insert = false,
+  }
+)
 
 local wr_group = vim.api.nvim_create_augroup('WinResize', { clear = true })
 
