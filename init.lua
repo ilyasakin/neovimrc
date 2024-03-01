@@ -839,4 +839,4 @@ vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignI
 vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignHint' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
---
+require('0x000000.remap')
