@@ -282,11 +282,11 @@ require('lazy').setup({
     }
   },
   { 'jmederosalvarado/roslyn.nvim' },
-  {
-    'windwp/nvim-autopairs',
-    event = "InsertEnter",
-    opts = {} -- this is equalent to setup({}) function
-  },
+  -- {
+  --   'windwp/nvim-autopairs',
+  --   event = "InsertEnter",
+  --   opts = {} -- this is equalent to setup({}) function
+  -- },
   {
     'LunarVim/bigfile.nvim',
     event = "VeryLazy",
