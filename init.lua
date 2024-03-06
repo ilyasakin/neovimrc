@@ -714,6 +714,22 @@ mason_lspconfig.setup_handlers {
       filetypes = (servers[server_name] or {}).filetypes,
     }
   end,
+  cssls = function()
+    require('lspconfig').cssls.setup {
+      capabilities = vim.tbl_deep_extend("force", capabilities, {
+        textDocument = {
+          completion = {
+            completionItem = {
+              snippetSupport = true,
+            },
+          },
+        },
+      }),
+      on_attach = on_attach,
+      settings = servers.cssls,
+      filetypes = servers.cssls.filetypes,
+    }
+  end,
 }
 
 require("roslyn").setup({
