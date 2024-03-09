@@ -745,6 +745,17 @@ require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
 --
 local lspkind = require 'lspkind'
+local cmp_lsp_types = require 'cmp.types.lsp'
+local is_variableLikeType = function(kind)
+  return kind == cmp_lsp_types.CompletionItemKind.Variable
+      or kind == cmp_lsp_types.CompletionItemKind.Field
+      or kind == cmp_lsp_types.CompletionItemKind.Property
+      or kind == cmp_lsp_types.CompletionItemKind.Unit
+      or kind == cmp_lsp_types.CompletionItemKind.Value
+      or kind == cmp_lsp_types.CompletionItemKind.Constant
+      -- Not exactly sure if these are variable-like. Close enough.
+      or kind == cmp_lsp_types.CompletionItemKind.Enum
+end
 cmp.setup {
   formatting = {
     format = lspkind.cmp_format({
@@ -807,6 +818,49 @@ cmp.setup {
     -- { name = 'luasnip' },
     { name = 'path' },
   },
+  sorting = {
+    comparators = {
+      cmp.config.compare.offset,
+      cmp.config.compare.exact,
+      -- cmp.config.compare.scopes,
+      cmp.config.compare.score,
+      cmp.config.compare.recently_used,
+      cmp.config.compare.locality,
+      --cmp.config.compare.kind,
+      --kind: Entires with smaller ordinal value of 'kind' will be ranked higher.
+      ---(see lsp.CompletionItemKind enum).
+      ---Exceptions are that Text(1) will be ranked the lowest, and snippets be the highest.
+      ---@type cmp.ComparatorFunction
+      function(entry1, entry2)
+        local kind1 = entry1:get_kind() --- @type lsp.CompletionItemKind | number
+        local kind2 = entry2:get_kind() --- @type lsp.CompletionItemKind | number
+
+        kind1 = kind1 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind1
+        kind2 = kind2 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind2
+
+        if kind1 ~= kind2 then
+          if is_variableLikeType(kind1) then
+            return true
+          end
+
+          if is_variableLikeType(kind2) then
+            return false
+          end
+
+          local diff = kind1 - kind2
+          if diff < 0 then
+            return true
+          elseif diff > 0 then
+            return false
+          end
+        end
+        return nil
+      end,
+      -- cmp.config.compare.sort_text,
+      cmp.config.compare.length,
+      cmp.config.compare.order,
+    },
+  }
 }
 
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
