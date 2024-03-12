@@ -838,7 +838,11 @@ cmp.setup {
         kind1 = kind1 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind1
         kind2 = kind2 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind2
 
-        if kind1 ~= kind2 then
+        local isKind1VariableLike = is_variableLikeType(kind1);
+        local isKind2VariableLike = is_variableLikeType(kind2);
+        local isBothVariableLike = isKind1VariableLike and isKind2VariableLike;
+
+        if kind1 ~= kind2 and not isBothVariableLike then
           if is_variableLikeType(kind1) then
             return true
           end
