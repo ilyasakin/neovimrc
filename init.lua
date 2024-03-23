@@ -205,11 +205,22 @@ require('lazy').setup({
     opts = {},
   },
 
+  {
+    'JoosepAlviste/nvim-ts-context-commentstring',
+  },
+
   -- "gc" to comment visual regions/lines
   {
     'numToStr/Comment.nvim',
+    dependencies = {
+      'JoosepAlviste/nvim-ts-context-commentstring'
+    },
     event = 'VeryLazy',
-    opts = {}
+    opts = {
+      pre_hook = function()
+        return vim.bo.commentstring
+      end,
+    }
   },
 
   -- Fuzzy Finder (files, lsp, etc)
