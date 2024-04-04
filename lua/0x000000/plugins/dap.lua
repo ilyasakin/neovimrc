@@ -11,8 +11,6 @@ return {
     "theHamsta/nvim-dap-virtual-text",
     "rcarriga/nvim-dap-ui",
   },
-  config = function()
-  end,
   keys = {
     {
       "<leader>dc",
@@ -63,5 +61,13 @@ return {
       end,
       desc = "Toggle REPL",
     },
+    {
+      "<leader>dz",
+      function()
+        require 'dap'.set_exception_breakpoints()
+      end
+      ,
+      desc = "Set exception breakpoints"
+    }
   },
 }
