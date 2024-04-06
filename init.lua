@@ -66,13 +66,8 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
-  'tpope/vim-fugitive',
-  -- 'tpope/vim-rhubarb',
-
-  -- Detect tabstop and shiftwidth automatically
-  -- 'tpope/vim-sleuth',
   {
-    'Darazaki/indent-o-matic',
+    'tpope/vim-fugitive',
     keys = {
       {
         '<leader>gs',
@@ -104,7 +99,26 @@ require('lazy').setup({
         mode = 'n',
         desc = 'Git [D]iff',
       },
-    },
+      {
+        '<leader>gac',
+        ':G add %<CR>',
+        mode = 'n',
+        desc = 'Git Add [C]urrent',
+      },
+      {
+        '<leader>gaa',
+        ':G add -A',
+        mode = 'n',
+        desc = 'Git Add [A]ll',
+      }
+    }
+  },
+  -- 'tpope/vim-rhubarb',
+
+  -- Detect tabstop and shiftwidth automatically
+  -- 'tpope/vim-sleuth',
+  {
+    'Darazaki/indent-o-matic',
     opts = {},
   },
 
