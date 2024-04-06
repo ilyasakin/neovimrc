@@ -221,6 +221,10 @@ require('lazy').setup({
     dependencies = {
       'JoosepAlviste/nvim-ts-context-commentstring'
     },
+    enabled = function()
+      local vim_version = vim.version()
+      return vim_version.major == 0 and vim_version.minor <= 9
+    end,
     event = 'VeryLazy',
     opts = {
       pre_hook = function()
