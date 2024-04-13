@@ -66,53 +66,8 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
-  {
-    'tpope/vim-fugitive',
-    keys = {
-      {
-        '<leader>gs',
-        ':G status<CR>',
-        mode = 'n',
-        desc = 'Git [S]tatus',
-      },
-      {
-        '<leader>gc',
-        ':G commit<CR>',
-        mode = 'n',
-        desc = 'Git [C]ommit',
-      },
-      {
-        '<leader>gp',
-        ':G push<CR>',
-        mode = 'n',
-        desc = 'Git [P]ush',
-      },
-      {
-        '<leader>gl',
-        ':G log<CR>',
-        mode = 'n',
-        desc = 'Git [L]og',
-      },
-      {
-        '<leader>gd',
-        ':Gvdiffsplit<CR>',
-        mode = 'n',
-        desc = 'Git [D]iff',
-      },
-      {
-        '<leader>gac',
-        ':G add %<CR>',
-        mode = 'n',
-        desc = 'Git Add [C]urrent',
-      },
-      {
-        '<leader>gaa',
-        ':G add -A',
-        mode = 'n',
-        desc = 'Git Add [A]ll',
-      }
-    }
-  },
+  'tpope/vim-fugitive',
+
   -- 'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
@@ -974,7 +929,9 @@ vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignI
 vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignHint' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
 require('0x000000.remap')
+require('0x000000.keymap')
 
 
 local quickCommit = function()
