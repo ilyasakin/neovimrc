@@ -180,9 +180,7 @@ require('lazy').setup({
     opts = {},
   },
 
-  {
-    'JoosepAlviste/nvim-ts-context-commentstring',
-  },
+  'JoosepAlviste/nvim-ts-context-commentstring',
 
   -- "gc" to comment visual regions/lines
   {
@@ -190,10 +188,6 @@ require('lazy').setup({
     dependencies = {
       'JoosepAlviste/nvim-ts-context-commentstring'
     },
-    enabled = function()
-      local vim_version = vim.version()
-      return vim_version.major == 0 and vim_version.minor <= 9
-    end,
     event = 'VeryLazy',
     opts = {
       pre_hook = function()
@@ -262,6 +256,11 @@ require('lazy').setup({
       --   If not available, we use `mini` as the fallback
       "rcarriga/nvim-notify",
     }
+  },
+  {
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+    opts = {}
   },
   { 'jmederosalvarado/roslyn.nvim' },
   -- {
