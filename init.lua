@@ -603,8 +603,8 @@ end, 0)
 -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
 -- Workaround for truncating long TypeScript inlay hints.
 -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
-local inlay_hint_handler = vim.lsp.handlers[methods.textDocument_inlayHint]
-vim.lsp.handlers[methods.textDocument_inlayHint] = function(err, result, ctx, config)
+local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
+vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(err, result, ctx, config)
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if client and client.name == 'typescript-tools' then
         result = vim.iter.map(function(hint)
