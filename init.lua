@@ -600,6 +600,26 @@ vim.defer_fn(function()
   }
 end, 0)
 
+-- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
+-- Workaround for truncating long TypeScript inlay hints.
+-- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
+local inlay_hint_handler = vim.lsp.handlers[methods.textDocument_inlayHint]
+vim.lsp.handlers[methods.textDocument_inlayHint] = function(err, result, ctx, config)
+    local client = vim.lsp.get_client_by_id(ctx.client_id)
+    if client and client.name == 'typescript-tools' then
+        result = vim.iter.map(function(hint)
+            local label = hint.label ---@type string
+            if label:len() >= 30 then
+                label = label:sub(1, 29) .. ellipsis
+            end
+            hint.label = label
+            return hint
+        end, result)
+    end
+
+    inlay_hint_handler(err, result, ctx, config)
+end
+
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(client, bufnr)
