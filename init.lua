@@ -531,6 +531,7 @@ vim.defer_fn(function()
       'awk',
       'bash',
       'c',
+      'cpp',
       'css',
       'csv',
       'dockerfile',
