@@ -752,6 +752,8 @@ local servers = {
       -- diagnostics = { disable = { 'missing-fields' } },
     },
   },
+  tsserver = {},
+  pyright = {},
 }
 
 -- Setup neovim lua configuration
@@ -766,9 +768,10 @@ capabilities.textDocument.completion.completionItem.snippetSupport = false
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
+local server_list = vim.tbl_keys(servers)
 
 mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
+  ensure_installed = server_list,
 }
 
 local lspconfig = require 'lspconfig'
