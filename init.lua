@@ -65,9 +65,6 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
-  -- Git related plugins
-  'tpope/vim-fugitive',
-
   -- 'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
@@ -133,7 +130,7 @@ require('lazy').setup({
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',        opts = {} },
-  require '0x000000.plugins.gitgutter',
+  require '0x000000.plugins.git',
 
   -- {
   --   -- Theme inspired by Atom
