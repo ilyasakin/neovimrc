@@ -16,15 +16,15 @@ vim.o.termguicolors = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.wo.relativenumber = true
-vim.g.do_filetype_lua = 1;
-vim.opt.swapfile = false;
-vim.opt.backup = false;
-vim.opt.wrap = false;
-vim.opt.guicursor = '';
-vim.opt.scrolloff = 4;
+vim.g.do_filetype_lua = 1
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.wrap = false
+vim.opt.guicursor = ''
+vim.opt.scrolloff = 4
 vim.cmd [[set diffopt+=linematch:50]]
 
-vim.loader.enable();
+vim.loader.enable()
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -59,7 +59,7 @@ require('lazy').setup({
   require 'plugins.dap',
 }, {})
 
-require('remap')
-require('keymap')
-require('signs')
-require('autocmd')
+require 'remap'
+require 'keymap'
+require 'signs'
+require 'autocmd'

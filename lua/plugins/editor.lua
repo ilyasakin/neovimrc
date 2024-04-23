@@ -14,32 +14,32 @@ return {
   },
 
   {
-    "m4xshen/hardtime.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+    'm4xshen/hardtime.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
     opts = {
-      enabled = false
-    }
+      enabled = false,
+    },
   },
 
   {
     'LunarVim/bigfile.nvim',
-    event = "VeryLazy",
+    event = 'VeryLazy',
   },
 
   {
     'f-person/git-blame.nvim',
     event = 'VeryLazy',
-    opts = {} -- this is equalent to setup({}) function
+    opts = {}, -- this is equalent to setup({}) function
   },
 
   {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
+    'kylechui/nvim-surround',
+    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
     config = function()
-      require("nvim-surround").setup({
+      require('nvim-surround').setup {
         -- Configuration here, or leave empty to use defaults
-      })
-    end
+      }
+    end,
   },
 }

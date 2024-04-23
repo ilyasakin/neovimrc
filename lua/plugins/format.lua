@@ -17,7 +17,8 @@ return {
       ['json'] = { 'prettier' },
       ['yaml'] = { 'prettier' },
       ['markdown'] = { 'prettier' },
-      ['cs'] = { 'csharpier' }
+      ['cs'] = { 'csharpier' },
+      ['lua'] = { 'stylua' },
     },
   },
   init = function()

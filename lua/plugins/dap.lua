@@ -1,119 +1,118 @@
 return {
   {
-    "mfussenegger/nvim-dap",
+    'mfussenegger/nvim-dap',
     dependencies = {
-      "jay-babu/mason-nvim-dap.nvim",
-      "LiadOz/nvim-dap-repl-highlights",
-      "theHamsta/nvim-dap-virtual-text",
-      "rcarriga/nvim-dap-ui",
+      'jay-babu/mason-nvim-dap.nvim',
+      'LiadOz/nvim-dap-repl-highlights',
+      'theHamsta/nvim-dap-virtual-text',
+      'rcarriga/nvim-dap-ui',
     },
     keys = {
       {
-        "<leader>dc",
+        '<leader>dc',
         function()
-          require("dap").continue()
+          require('dap').continue()
         end,
-        desc = "Debug: Continue",
+        desc = 'Debug: Continue',
       },
       {
-        "<leader>dn",
+        '<leader>dn',
         function()
-          require("dap").step_over()
+          require('dap').step_over()
         end,
-        desc = "Debug: Step over",
+        desc = 'Debug: Step over',
       },
       {
-        "<leader>di",
+        '<leader>di',
         function()
-          require("dap").step_into()
+          require('dap').step_into()
         end,
-        desc = "Debug: Step into",
+        desc = 'Debug: Step into',
       },
       {
-        "<leader>do",
+        '<leader>do',
         function()
-          require("dap").step_out()
+          require('dap').step_out()
         end,
-        desc = "Debug: Step out",
+        desc = 'Debug: Step out',
       },
       {
-        "<leader>db",
+        '<leader>db',
         function()
-          require("dap").toggle_breakpoint()
+          require('dap').toggle_breakpoint()
         end,
-        desc = "Debug: Toggle breakpoint",
+        desc = 'Debug: Toggle breakpoint',
       },
       {
-        "<leader>dp",
+        '<leader>dp',
         function()
-          require("dap").set_breakpoint(nil, nil, vim.fn.input "Log point message: ")
+          require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
         end,
-        desc = "Set log point",
+        desc = 'Set log point',
       },
       {
-        "<leader>dr",
+        '<leader>dr',
         function()
-          require("dap").repl.toggle()
+          require('dap').repl.toggle()
         end,
-        desc = "Toggle REPL",
+        desc = 'Toggle REPL',
       },
       {
-        "<leader>dz",
+        '<leader>dz',
         function()
-          require 'dap'.set_exception_breakpoints()
-        end
-        ,
-        desc = "Set exception breakpoints"
-      }
+          require('dap').set_exception_breakpoints()
+        end,
+        desc = 'Set exception breakpoints',
+      },
     },
   },
   {
-    "rcarriga/nvim-dap-ui",
+    'rcarriga/nvim-dap-ui',
     dependencies = {
-      "mfussenegger/nvim-dap",
-      "nvim-neotest/nvim-nio"
+      'mfussenegger/nvim-dap',
+      'nvim-neotest/nvim-nio',
     },
 
     opts = {},
     keys = {
       {
-        "<leader>du",
+        '<leader>du',
         function()
-          require("dapui").toggle { layout = 1 }
+          require('dapui').toggle { layout = 1 }
         end,
-        desc = "Toggle UI sidebar",
+        desc = 'Toggle UI sidebar',
       },
       {
-        "<leader>dU",
+        '<leader>dU',
         function()
-          require("dapui").toggle {}
+          require('dapui').toggle {}
         end,
-        desc = "Toggle UI",
+        desc = 'Toggle UI',
       },
       {
-        "<leader>dt",
+        '<leader>dt',
         function()
-          require("dapui").toggle { layout = 2 }
+          require('dapui').toggle { layout = 2 }
         end,
-        desc = "Toggle console",
+        desc = 'Toggle console',
       },
       {
-        "<M-k>",
+        '<M-k>',
         function()
-          require("dapui").eval()
+          require('dapui').eval()
         end,
-        desc = "Evaluate expression",
-        mode = { "n", "v" },
+        desc = 'Evaluate expression',
+        mode = { 'n', 'v' },
       },
     },
   },
   {
-    "jay-babu/mason-nvim-dap.nvim",
+    'jay-babu/mason-nvim-dap.nvim',
     -- Only load when nvim-dap loads
     lazy = true,
     dependencies = {
-      "williamboman/mason.nvim",
-      "mfussenegger/nvim-dap",
+      'williamboman/mason.nvim',
+      'mfussenegger/nvim-dap',
     },
     opts = {
       ensure_installed = { 'stylua', 'jq' },
@@ -126,10 +125,10 @@ return {
         end,
 
         coreclr = function(config)
-          local pickers = require('telescope.pickers')
-          local finders = require('telescope.finders')
-          local sorters = require('telescope.sorters')
-          local actions = require "telescope.actions"
+          local pickers = require 'telescope.pickers'
+          local finders = require 'telescope.finders'
+          local sorters = require 'telescope.sorters'
+          local actions = require 'telescope.actions'
           local action_state = require 'telescope.actions.state'
 
           -- ps -eo comm,pid,args | sed "s|$HOME|~|g"
@@ -141,7 +140,7 @@ return {
           }
 
           local pick = function()
-            local value = nil;
+            local value = nil
             local co = coroutine.running()
             local picker = pickers.new(opts, {
               attach_mappings = function(prompt_bufnr, _)
@@ -160,33 +159,33 @@ return {
                 -- keep default keybindings
                 return true
               end,
-            });
+            })
             picker:find()
             value = coroutine.yield()
             value = vim.trim(value[1])
             local parts = vim.split(value, ' ')
             -- return first part
             return tonumber(parts[1])
-          end;
+          end
 
           config.adapters = {
             type = 'executable',
             command = '/Users/ilyasakin/dotfiles/bin/netcoredbg/netcoredbg',
-            args = { '--interpreter=vscode' }
+            args = { '--interpreter=vscode' },
           }
 
           config.configurations = {
             {
-              type = "coreclr",
-              name = "attach - netcoredbg",
-              request = "attach",
+              type = 'coreclr',
+              name = 'attach - netcoredbg',
+              request = 'attach',
               processId = pick,
-            }
+            },
           }
 
           require('mason-nvim-dap').default_setup(config)
         end,
       },
     },
-  }
+  },
 }

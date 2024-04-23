@@ -3,7 +3,12 @@ local setup_lsp_handlers = function()
   -- Workaround for truncating long TypeScript inlay hints.
   -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
   local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
-  vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(err, result, ctx, config)
+  vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(
+    err,
+    result,
+    ctx,
+    config
+  )
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if client and client.name == 'typescript-tools' then
       result = vim.iter.map(function(hint)
@@ -19,22 +24,20 @@ local setup_lsp_handlers = function()
     inlay_hint_handler(err, result, ctx, config)
   end
 
-  vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics,
-    {
+  vim.lsp.handlers['textDocument/publishDiagnostics'] =
+    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
       underline = {
-        severity = { min = vim.diagnostic.severity.ERROR }
+        severity = { min = vim.diagnostic.severity.ERROR },
       },
       signs = {
-        severity = { min = vim.diagnostic.severity.ERROR }
+        severity = { min = vim.diagnostic.severity.ERROR },
       },
       virtual_text = {
         spacing = 5,
-        severity = { min = vim.diagnostic.severity.ERROR }
+        severity = { min = vim.diagnostic.severity.ERROR },
       },
       update_in_insert = false,
-    }
-  )
+    })
 end
 
 local on_attach = function(client, bufnr)
@@ -52,9 +55,21 @@ local on_attach = function(client, bufnr)
   utils.lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   utils.lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   utils.lsp_nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  utils.lsp_nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  utils.lsp_nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  utils.lsp_nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  utils.lsp_nmap(
+    '<leader>D',
+    require('telescope.builtin').lsp_type_definitions,
+    'Type [D]efinition'
+  )
+  utils.lsp_nmap(
+    '<leader>ds',
+    require('telescope.builtin').lsp_document_symbols,
+    '[D]ocument [S]ymbols'
+  )
+  utils.lsp_nmap(
+    '<leader>ws',
+    require('telescope.builtin').lsp_dynamic_workspace_symbols,
+    '[W]orkspace [S]ymbols'
+  )
 
   -- See `:help K` for why this keymap
   utils.lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -75,10 +90,9 @@ return {
     { 'williamboman/mason.nvim', config = true },
     'jmederosalvarado/roslyn.nvim',
     'williamboman/mason-lspconfig.nvim',
-    { 'j-hui/fidget.nvim',       opts = {} },
+    { 'j-hui/fidget.nvim', opts = {} },
     'folke/neodev.nvim',
     'hrsh7th/nvim-cmp',
-
   },
   config = function()
     setup_lsp_handlers()
@@ -104,18 +118,19 @@ return {
         Lua = {
           workspace = { checkThirdParty = false },
           telemetry = { enable = false },
-          hint = { enable = true }
+          hint = { enable = true },
           -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
           -- diagnostics = { disable = { 'missing-fields' } },
         },
       },
-      tsserver = {}
+      tsserver = {},
     }
 
     -- Setup neovim lua configuration
     require('neodev').setup()
 
-    local capabilities = vim.tbl_deep_extend("force",
+    local capabilities = vim.tbl_deep_extend(
+      'force',
       vim.lsp.protocol.make_client_capabilities(),
       require('cmp_nvim_lsp').default_capabilities()
     )
@@ -143,7 +158,7 @@ return {
       end,
       cssls = function()
         require('lspconfig').cssls.setup {
-          capabilities = vim.tbl_deep_extend("force", capabilities, {
+          capabilities = vim.tbl_deep_extend('force', capabilities, {
             textDocument = {
               completion = {
                 completionItem = {
@@ -159,10 +174,10 @@ return {
       end,
     }
 
-    require("roslyn").setup({
-      roslyn_version = "4.9.2",
+    require('roslyn').setup {
+      roslyn_version = '4.9.2',
       on_attach = on_attach,
-      capabilities = capabilities
-    });
-  end
-};
+      capabilities = capabilities,
+    }
+  end,
+}

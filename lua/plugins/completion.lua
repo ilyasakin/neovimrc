@@ -35,19 +35,19 @@ return {
     local cmp_lsp_types = require 'cmp.types.lsp'
     local is_variableLikeType = function(kind)
       return kind == cmp_lsp_types.CompletionItemKind.Variable
-          or kind == cmp_lsp_types.CompletionItemKind.Field
-          or kind == cmp_lsp_types.CompletionItemKind.Property
-          or kind == cmp_lsp_types.CompletionItemKind.Unit
-          or kind == cmp_lsp_types.CompletionItemKind.Value
-          or kind == cmp_lsp_types.CompletionItemKind.Constant
-          -- Not exactly sure if these are variable-like. Close enough.
-          or kind == cmp_lsp_types.CompletionItemKind.Enum
+        or kind == cmp_lsp_types.CompletionItemKind.Field
+        or kind == cmp_lsp_types.CompletionItemKind.Property
+        or kind == cmp_lsp_types.CompletionItemKind.Unit
+        or kind == cmp_lsp_types.CompletionItemKind.Value
+        or kind == cmp_lsp_types.CompletionItemKind.Constant
+        -- Not exactly sure if these are variable-like. Close enough.
+        or kind == cmp_lsp_types.CompletionItemKind.Enum
     end
     cmp.setup {
       formatting = {
-        format = lspkind.cmp_format({
+        format = lspkind.cmp_format {
           mode = 'symbol_text', -- show only symbol annotations
-          maxwidth = 50,    -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+          maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
           -- can also be a function to dynamically calculate max width such as
           -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
           ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
@@ -58,8 +58,8 @@ return {
           before = function(entry, vim_item)
             return vim_item
           end,
-          symbol_map = { Copilot = "" }
-        })
+          symbol_map = { Copilot = '' },
+        },
       },
       snippet = {
         expand = function(args)
@@ -111,9 +111,9 @@ return {
             kind1 = kind1 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind1
             kind2 = kind2 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind2
 
-            local isKind1VariableLike = is_variableLikeType(kind1);
-            local isKind2VariableLike = is_variableLikeType(kind2);
-            local isBothVariableLike = isKind1VariableLike and isKind2VariableLike;
+            local isKind1VariableLike = is_variableLikeType(kind1)
+            local isKind2VariableLike = is_variableLikeType(kind2)
+            local isBothVariableLike = isKind1VariableLike and isKind2VariableLike
 
             if kind1 ~= kind2 and not isBothVariableLike then
               if is_variableLikeType(kind1) then
@@ -137,7 +137,7 @@ return {
           cmp.config.compare.length,
           cmp.config.compare.order,
         },
-      }
+      },
     }
-  end
+  end,
 }
