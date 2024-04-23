@@ -22,6 +22,7 @@ vim.opt.backup = false;
 vim.opt.wrap = false;
 vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
+vim.cmd [[set diffopt+=linematch:50]]
 
 vim.loader.enable();
 
@@ -43,19 +44,6 @@ vim.opt.rtp:prepend(lazypath)
 -- [[ Configure plugins ]]
 
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
-  -- 'tpope/vim-rhubarb',
-
-  -- Detect tabstop and shiftwidth automatically
-  -- 'tpope/vim-sleuth',
-  {
-    'Darazaki/indent-o-matic',
-    opts = {},
-  },
-
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
   {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
@@ -72,132 +60,18 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-  },
-
+  require '0x000000.plugins.typescript',
   require '0x000000.plugins.completion',
-
-  -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',        opts = {} },
+  require '0x000000.plugins.which-key',
   require '0x000000.plugins.git',
-
-  -- {
-  --   -- Theme inspired by Atom
-  --   'navarasu/onedark.nvim',
-  --   priority = 1000,
-  --   lazy = false,
-  --   config = function()
-  --     require('onedark').setup {
-  --       -- Set a style preset. 'dark' is default.
-  --       style = 'dark', -- dark, darker, cool, deep, warm, warmer, light
-  --     }
-  --     require('onedark').load()
-  --   end,
-  -- },
-
-  {
-    "rose-pine/neovim",
-    name = "rose-pine",
-    config = function()
-      vim.cmd("colorscheme rose-pine")
-    end
-  },
-
-  {
-    -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'auto',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
-  },
-
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    opts = {},
-  },
-
+  require '0x000000.plugins.theme',
+  require '0x000000.plugins.statusline',
   require '0x000000.plugins.comment',
   require '0x000000.plugins.telescope',
   require '0x000000.plugins.tree-sitter',
-
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    enabled = false,
-    opts = {
-      lsp = {
-        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
-        },
-      },
-      -- you can enable a preset for easier configuration
-      presets = {
-        bottom_search = true,         -- use a classic bottom cmdline for search
-        command_palette = true,       -- position the cmdline and popupmenu together
-        long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = false,           -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = false,       -- add a border to hover docs and signature help
-      },
-    },
-    dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-      "MunifTanjim/nui.nvim",
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      "rcarriga/nvim-notify",
-    }
-  },
-  {
-    "m4xshen/hardtime.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-    opts = {
-      enabled = false
-    }
-  },
   { 'jmederosalvarado/roslyn.nvim' },
-  -- {
-  --   'windwp/nvim-autopairs',
-  --   event = "InsertEnter",
-  --   opts = {} -- this is equalent to setup({}) function
-  -- },
-  {
-    'LunarVim/bigfile.nvim',
-    event = "VeryLazy",
-  },
-  {
-    'f-person/git-blame.nvim',
-    event = 'VeryLazy',
-    opts = {} -- this is equalent to setup({}) function
-  },
-  {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
-    config = function()
-      require("nvim-surround").setup({
-        -- Configuration here, or leave empty to use defaults
-      })
-    end
-  },
-
   require '0x000000.plugins.diagnostics',
-
+  require '0x000000.plugins.editor',
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.dap',
@@ -205,16 +79,6 @@ require('lazy').setup({
   require '0x000000.plugins.dap-ui'
 }, {})
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
 
 -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
 -- Workaround for truncating long TypeScript inlay hints.
@@ -269,25 +133,6 @@ local on_attach = function(client, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 end
-
--- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-  ['<leader>q'] = { name = '[Q]uick', _ = 'which_key_ignore' }
-}
--- register which-key VISUAL mode
--- required for visual <leader>hs (hunk stage) to work
-require('which-key').register({
-  ['<leader>'] = { name = 'VISUAL <leader>' },
-  ['<leader>h'] = { 'Git [H]unk' },
-}, { mode = 'v' })
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
@@ -392,26 +237,7 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
   }
 )
 
-local wr_group = vim.api.nvim_create_augroup('WinResize', { clear = true })
-
-vim.api.nvim_create_autocmd(
-  'VimResized',
-  {
-    group = wr_group,
-    pattern = '*',
-    command = 'wincmd =',
-    desc = 'Automatically resize windows when the host window size changes.'
-  }
-)
-
--- let g:do_filetype_lua = 1
--- Enable filetype.lua, which supposed to enhance performance? Idk
-vim.cmd [[set diffopt+=linematch:50]]
-
-vim.fn.sign_define('DiagnosticSignError', { text = '!', texthl = 'DiagnosticSignError' })
-vim.fn.sign_define('DiagnosticSignWarn', { text = '!', texthl = 'DiagnosticSignWarn' })
-vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignInfo' })
-vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignHint' })
-
 require('0x000000.remap')
 require('0x000000.keymap')
+require('0x000000.signs')
+require('0x000000.autocmd')
