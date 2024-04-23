@@ -85,99 +85,104 @@ local on_attach = function(client, bufnr)
 end
 
 return {
-  'neovim/nvim-lspconfig',
-  dependencies = {
-    { 'williamboman/mason.nvim', config = true },
-    'jmederosalvarado/roslyn.nvim',
-    'williamboman/mason-lspconfig.nvim',
-    { 'j-hui/fidget.nvim', opts = {} },
-    'folke/neodev.nvim',
-    'hrsh7th/nvim-cmp',
-  },
-  config = function()
-    setup_lsp_handlers()
-    require('mason').setup()
-    require('mason-lspconfig').setup()
+  {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      { 'williamboman/mason.nvim', config = true },
+      'jmederosalvarado/roslyn.nvim',
+      'williamboman/mason-lspconfig.nvim',
+      { 'j-hui/fidget.nvim', opts = {} },
+      'folke/neodev.nvim',
+      'hrsh7th/nvim-cmp',
+    },
+    config = function()
+      setup_lsp_handlers()
+      require('mason').setup()
+      require('mason-lspconfig').setup()
 
-    -- Enable the following language servers
-    --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-    --
-    --  Add any additional override configuration in the following tables. They will be passed to
-    --  the `settings` field of the server config. You must look up that documentation yourself.
-    --
-    --  If you want to override the default filetypes that your language server will attach to you can
-    --  define the property 'filetypes' to the map in question.
-    local servers = {
-      clangd = {},
-      gopls = {},
-      pyright = {},
-      rust_analyzer = {},
-      html = { filetypes = { 'html', 'twig', 'hbs' } },
-      cssls = { filetypes = { 'css', 'scss', 'less', 'sass' } },
-      lua_ls = {
-        Lua = {
-          workspace = { checkThirdParty = false },
-          telemetry = { enable = false },
-          hint = { enable = true },
-          -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-          -- diagnostics = { disable = { 'missing-fields' } },
+      -- Enable the following language servers
+      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+      --
+      --  Add any additional override configuration in the following tables. They will be passed to
+      --  the `settings` field of the server config. You must look up that documentation yourself.
+      --
+      --  If you want to override the default filetypes that your language server will attach to you can
+      --  define the property 'filetypes' to the map in question.
+      local servers = {
+        clangd = {},
+        gopls = {},
+        pyright = {},
+        rust_analyzer = {},
+        html = { filetypes = { 'html', 'twig', 'hbs' } },
+        cssls = { filetypes = { 'css', 'scss', 'less', 'sass' } },
+        lua_ls = {
+          Lua = {
+            workspace = { checkThirdParty = false },
+            telemetry = { enable = false },
+            hint = { enable = true },
+            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+            -- diagnostics = { disable = { 'missing-fields' } },
+          },
         },
-      },
-      tsserver = {},
-    }
+        tsserver = {},
+      }
 
-    -- Setup neovim lua configuration
-    require('neodev').setup()
+      -- Setup neovim lua configuration
+      require('neodev').setup()
 
-    local capabilities = vim.tbl_deep_extend(
-      'force',
-      vim.lsp.protocol.make_client_capabilities(),
-      require('cmp_nvim_lsp').default_capabilities()
-    )
-    capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
-    capabilities.textDocument.completion.completionItem.snippetSupport = false
+      local capabilities = vim.tbl_deep_extend(
+        'force',
+        vim.lsp.protocol.make_client_capabilities(),
+        require('cmp_nvim_lsp').default_capabilities()
+      )
+      capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
+      capabilities.textDocument.completion.completionItem.snippetSupport = false
 
-    -- Ensure the servers above are installed
-    local mason_lspconfig = require 'mason-lspconfig'
-    local server_list = vim.tbl_keys(servers)
+      -- Ensure the servers above are installed
+      local mason_lspconfig = require 'mason-lspconfig'
+      local server_list = vim.tbl_keys(servers)
 
-    mason_lspconfig.setup {
-      ensure_installed = server_list,
-    }
+      mason_lspconfig.setup {
+        ensure_installed = server_list,
+      }
 
-    local lspconfig = require 'lspconfig'
+      local lspconfig = require 'lspconfig'
 
-    mason_lspconfig.setup_handlers {
-      function(server_name)
-        lspconfig[server_name].setup {
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = servers[server_name],
-          filetypes = (servers[server_name] or {}).filetypes,
-        }
-      end,
-      cssls = function()
-        require('lspconfig').cssls.setup {
-          capabilities = vim.tbl_deep_extend('force', capabilities, {
-            textDocument = {
-              completion = {
-                completionItem = {
-                  snippetSupport = true,
+      mason_lspconfig.setup_handlers {
+        function(server_name)
+          lspconfig[server_name].setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+            settings = servers[server_name],
+            filetypes = (servers[server_name] or {}).filetypes,
+          }
+        end,
+        cssls = function()
+          require('lspconfig').cssls.setup {
+            capabilities = vim.tbl_deep_extend('force', capabilities, {
+              textDocument = {
+                completion = {
+                  completionItem = {
+                    snippetSupport = true,
+                  },
                 },
               },
-            },
-          }),
-          on_attach = on_attach,
-          settings = servers.cssls,
-          filetypes = servers.cssls.filetypes,
-        }
-      end,
-    }
+            }),
+            on_attach = on_attach,
+            settings = servers.cssls,
+            filetypes = servers.cssls.filetypes,
+          }
+        end,
+      }
 
-    require('roslyn').setup {
-      roslyn_version = '4.9.2',
-      on_attach = on_attach,
-      capabilities = capabilities,
-    }
-  end,
+      require('roslyn').setup {
+        on_attach = on_attach,
+        capabilities = capabilities,
+      }
+    end,
+  },
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  },
 }
