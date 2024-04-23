@@ -57,8 +57,6 @@ require('lazy').setup({
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.dap',
-  require '0x000000.plugins.mason-dap',
-  require '0x000000.plugins.dap-ui'
 }, {})
 
 require('0x000000.remap')
