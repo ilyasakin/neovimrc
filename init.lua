@@ -1,47 +1,31 @@
---[[
-===================================================================== ==================== READ THIS BEFORE CONTINUING ==================== ===================================================================== Kickstart.nvim is *not* a distribution. Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
---]]
-
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
+-- [[ Setting options ]]
+vim.o.hlsearch = true
+vim.wo.number = true
+vim.o.mouse = 'a'
+vim.o.clipboard = 'unnamedplus'
+vim.o.breakindent = true
+vim.o.undofile = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
+vim.wo.signcolumn = 'yes'
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
+vim.o.lazyredraw = true
+vim.o.completeopt = 'menuone,noselect'
+vim.o.termguicolors = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.wo.relativenumber = true
+vim.g.do_filetype_lua = 1;
+vim.opt.swapfile = false;
+vim.opt.backup = false;
+vim.opt.wrap = false;
+vim.opt.guicursor = '';
+vim.opt.scrolloff = 4;
 
 vim.loader.enable();
 
 -- [[ Install `lazy.nvim` plugin manager ]]
---    https://github.com/folke/lazy.nvim
---    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system {
@@ -57,11 +41,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- [[ Configure plugins ]]
--- NOTE: Here is where you install your plugins.
---  You can configure plugins using the `config` key.
---
---  You can also configure plugins after the setup call,
---    as they will be available in your neovim runtime.
+
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
@@ -215,113 +195,15 @@ require('lazy').setup({
       })
     end
   },
-  {
-    'dgagn/diagflow.nvim',
-    event = 'LspAttach',
-    opts = {}
-  },
-  {
-    "folke/trouble.nvim",
-    event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = {
-      {
-        '<leader>tt',
-        ':TroubleToggle<CR>',
-        mode = 'n',
-        desc = 'Toggle [T]rouble'
-      }
-    },
-    opts = {},
-  },
 
-  {
-    "zbirenbaum/neodim",
-    event = "LspAttach",
-    config = function()
-      require("neodim").setup({
-        refresh_delay = 75,
-        alpha = 0.75,
-        blend_color = "#000000",
-        hide = {
-          underline = true,
-          virtual_text = true,
-          signs = true,
-        },
-        regex = {
-          "[uU]nused",
-          "[nN]ever [rR]ead",
-          "[nN]ot [rR]ead",
-        },
-        priority = 128,
-        disable = {},
-      })
-    end
-  },
+  require '0x000000.plugins.diagnostics',
 
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
   require '0x000000.plugins.dap',
   require '0x000000.plugins.mason-dap',
   require '0x000000.plugins.dap-ui'
-
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
 }, {})
-
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
-
--- Set highlight on search
-vim.o.hlsearch = true
-
--- Make line numbers default
-vim.wo.number = true
-
--- Enable mouse mode
-vim.o.mouse = 'a'
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
-vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
--- Case-insensitive searching UNLESS \C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
--- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
-
--- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-
-vim.o.lazyredraw = true
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
-
--- NOTE: You should make sure your terminal supports this
-vim.o.termguicolors = true
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -363,21 +245,21 @@ local on_attach = function(client, bufnr)
     vim.lsp.inlay_hint.enable(bufnr, true)
   end
 
-  lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  lsp_nmap('<leader>ca', function()
+  utils.lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  utils.lsp_nmap('<leader>ca', function()
     vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
   end, '[C]ode [A]ction')
 
-  lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-  lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  lsp_nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  lsp_nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  lsp_nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  lsp_nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  utils.lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+  utils.lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  utils.lsp_nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+  utils.lsp_nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+  utils.lsp_nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+  utils.lsp_nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
-  lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  lsp_nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  utils.lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+  utils.lsp_nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   utils.lsp_nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -524,20 +406,12 @@ vim.api.nvim_create_autocmd(
 
 -- let g:do_filetype_lua = 1
 -- Enable filetype.lua, which supposed to enhance performance? Idk
-vim.g.do_filetype_lua = 1;
-vim.opt.swapfile = false;
-vim.opt.backup = false;
-vim.opt.wrap = false;
-vim.opt.guicursor = '';
-vim.opt.scrolloff = 4;
 vim.cmd [[set diffopt+=linematch:50]]
 
 vim.fn.sign_define('DiagnosticSignError', { text = '!', texthl = 'DiagnosticSignError' })
 vim.fn.sign_define('DiagnosticSignWarn', { text = '!', texthl = 'DiagnosticSignWarn' })
 vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignHint' })
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
 
 require('0x000000.remap')
 require('0x000000.keymap')
