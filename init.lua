@@ -22,7 +22,7 @@ vim.opt.backup = false
 vim.opt.wrap = false
 vim.opt.guicursor = ''
 vim.opt.scrolloff = 4
-vim.cmd [[set diffopt+=linematch:50]]
+vim.opt.diffopt = vim.opt.diffopt + 'linematch:50'
 
 vim.loader.enable()
 
