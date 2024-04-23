@@ -5,7 +5,7 @@ return {
   },
   {
     'lewis6991/gitsigns.nvim',
-    event = "BufRead",
+    event = "VeryLazy",
     opts = {
       signs = {
         add = {
@@ -71,6 +71,38 @@ return {
       },
       yadm = {
         enable = false,
+      },
+    },
+    keys = {
+      {
+        '<leader>hp',
+        ':lua require"gitsigns".preview_hunk()<CR>',
+        mode = 'n',
+        desc = '[P]review git hunk',
+      },
+      {
+        '<leader>hs',
+        ':lua require"gitsigns".stage_hunk()<CR>',
+        mode = 'n',
+        desc = '[S]tage git hunk',
+      },
+      {
+        '<leader>hu',
+        ':lua require"gitsigns".undo_stage_hunk()<CR>',
+        mode = 'n',
+        desc = '[U]ndo git hunk',
+      },
+      {
+        ']c',
+        ':lua require"gitsigns".next_hunk()<CR>',
+        mode = 'n',
+        desc = 'Jump to [N]ext git hunk',
+      },
+      {
+        '[c',
+        ':lua require"gitsigns".prev_hunk()<CR>',
+        mode = 'n',
+        desc = 'Jump to [P]revious git hunk',
       },
     },
   },
