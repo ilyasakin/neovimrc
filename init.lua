@@ -42,24 +42,24 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  require '0x000000.plugins.completion',
-  require '0x000000.plugins.lsp',
-  require '0x000000.plugins.typescript',
-  require '0x000000.plugins.which-key',
-  require '0x000000.plugins.git',
-  require '0x000000.plugins.theme',
-  require '0x000000.plugins.statusline',
-  require '0x000000.plugins.comment',
-  require '0x000000.plugins.telescope',
-  require '0x000000.plugins.tree-sitter',
-  require '0x000000.plugins.diagnostics',
-  require '0x000000.plugins.editor',
-  require '0x000000.plugins.format',
-  require '0x000000.plugins.copilot',
-  require '0x000000.plugins.dap',
+  require 'plugins.completion',
+  require 'plugins.lsp',
+  require 'plugins.typescript',
+  require 'plugins.which-key',
+  require 'plugins.git',
+  require 'plugins.theme',
+  require 'plugins.statusline',
+  require 'plugins.comment',
+  require 'plugins.telescope',
+  require 'plugins.tree-sitter',
+  require 'plugins.diagnostics',
+  require 'plugins.editor',
+  require 'plugins.format',
+  require 'plugins.copilot',
+  require 'plugins.dap',
 }, {})
 
-require('0x000000.remap')
-require('0x000000.keymap')
-require('0x000000.signs')
-require('0x000000.autocmd')
+require('remap')
+require('keymap')
+require('signs')
+require('autocmd')

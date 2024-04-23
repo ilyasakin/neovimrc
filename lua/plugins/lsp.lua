@@ -38,7 +38,7 @@ local setup_lsp_handlers = function()
 end
 
 local on_attach = function(client, bufnr)
-  local utils = require '0x000000.utils'
+  local utils = require 'utils'
 
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(bufnr, true)
