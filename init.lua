@@ -96,37 +96,8 @@ require('lazy').setup({
     "pmizio/typescript-tools.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
   },
-  {
-    -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      {
-        'L3MON4D3/LuaSnip',
-        build = (function()
-          -- Build Step is needed for regex support in snippets
-          -- This step is not supported in many windows environments
-          -- Remove the below condition to re-enable on windows
-          if vim.fn.has 'win32' == 1 then
-            return
-          end
-          return 'make install_jsregexp'
-        end)(),
-      },
-      'saadparwaiz1/cmp_luasnip',
-      'onsails/lspkind.nvim',
 
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-
-      -- Adds a number of user-friendly snippets
-      -- 'rafamadriz/friendly-snippets',
-    },
-    opts = function(_, opts)
-
-    end
-  },
+  require '0x000000.plugins.completion',
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',        opts = {} },
@@ -177,52 +148,9 @@ require('lazy').setup({
     opts = {},
   },
 
-  'JoosepAlviste/nvim-ts-context-commentstring',
-
-  -- "gc" to comment visual regions/lines
-  {
-    'numToStr/Comment.nvim',
-    dependencies = {
-      'JoosepAlviste/nvim-ts-context-commentstring'
-    },
-    event = 'VeryLazy',
-    opts = {
-      pre_hook = function()
-        return vim.bo.commentstring
-      end,
-    }
-  },
-
-  -- Fuzzy Finder (files, lsp, etc)
-  {
-    'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
-    },
-  },
-
-  {
-    -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-      'windwp/nvim-ts-autotag',
-    },
-    build = ':TSUpdate',
-  },
+  require '0x000000.plugins.comment',
+  require '0x000000.plugins.telescope',
+  require '0x000000.plugins.tree-sitter',
 
   {
     "folke/noice.nvim",
@@ -333,7 +261,6 @@ require('lazy').setup({
 
   require '0x000000.plugins.format',
   require '0x000000.plugins.copilot',
-  require '0x000000.plugins.copilot-cmp',
   require '0x000000.plugins.dap',
   require '0x000000.plugins.mason-dap',
   require '0x000000.plugins.dap-ui'
@@ -407,203 +334,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup {
-  defaults = {
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-  },
-}
-
--- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
-
--- Telescope live_grep in git root
--- Function to find the git root directory based on the current buffer's path
-local function find_git_root()
-  -- Use the current buffer's path as the starting point for the git search
-  local current_file = vim.api.nvim_buf_get_name(0)
-  local current_dir
-  local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == '' then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ':h')
-  end
-
-  -- Find the Git root directory from the current file's path
-  local git_root = vim.fn.systemlist('git -C ' .. vim.fn.escape(current_dir, ' ') .. ' rev-parse --show-toplevel')[1]
-  if vim.v.shell_error ~= 0 then
-    print 'Not a git repository. Searching on current working directory'
-    return cwd
-  end
-  return git_root
-end
-
--- Custom live_grep function to search in git root
-local function live_grep_git_root()
-  local git_root = find_git_root()
-  if git_root then
-    require('telescope.builtin').live_grep {
-      search_dirs = { git_root },
-    }
-  end
-end
-
-vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
-
--- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
-
-local function telescope_live_grep_open_files()
-  require('telescope.builtin').live_grep {
-    grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
-  }
-end
-vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
-vim.keymap.set('n', '<leader>ss', require('telescope.builtin').builtin, { desc = '[S]earch [S]elect Telescope' })
-vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-
--- [[ Configure Treesitter ]]
--- See `:help nvim-treesitter`
--- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
-vim.defer_fn(function()
-  require('nvim-treesitter.configs').setup {
-    -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = {
-      'awk',
-      'bash',
-      'c',
-      'cpp',
-      'css',
-      'csv',
-      'dockerfile',
-      'git_config',
-      'git_rebase',
-      'gitattributes',
-      'gitcommit',
-      'gitignore',
-      'go',
-      'gomod',
-      'html',
-      'javascript',
-      'json',
-      'kotlin',
-      'lua',
-      'markdown',
-      'prisma',
-      'python',
-      'rust',
-      'scss',
-      'sql',
-      'swift',
-      'toml',
-      'typescript',
-      'vim',
-      'vimdoc',
-      'vue',
-      'xml',
-      'yaml',
-      'zig',
-    },
-
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-    auto_install = false,
-    -- Install languages synchronously (only applied to `ensure_installed`)
-    sync_install = false,
-    -- List of parsers to ignore installing
-    ignore_install = {},
-    -- You can specify additional Treesitter modules here: -- For example: -- playground = {--enable = true,-- },
-    modules = {},
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = false
-    },
-    autotag = {
-      enable = true,
-    },
-    indent = {
-      enable = true,
-    },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<c-space>',
-        node_incremental = '<c-space>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<M-space>',
-      },
-    },
-    textobjects = {
-      select = {
-        enable = true,
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-        keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
-          ['aa'] = '@parameter.outer',
-          ['ia'] = '@parameter.inner',
-          ['af'] = '@function.outer',
-          ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',
-          ['ic'] = '@class.inner',
-        },
-      },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']M'] = '@function.outer',
-          [']['] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ['<leader>a'] = '@parameter.inner',
-        },
-        swap_previous = {
-          ['<leader>A'] = '@parameter.inner',
-        },
-      },
-    },
-  }
-end, 0)
-
 -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
 -- Workaround for truncating long TypeScript inlay hints.
 -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
@@ -627,45 +357,33 @@ end
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(client, bufnr)
-  -- NOTE: Remember that lua is a real programming language, and as such it is possible
-  -- to define small helper and utility functions so you don't have to repeat yourself
-  -- many times.
-  --
-  -- In this case, we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
-  end
+  local utils = require '0x000000.utils'
 
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(bufnr, true)
   end
 
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', function()
+  lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  lsp_nmap('<leader>ca', function()
     vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
   end, '[C]ode [A]ction')
 
-  nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+  lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  lsp_nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+  lsp_nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+  lsp_nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+  lsp_nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+  lsp_nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function()
+  utils.lsp_nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  utils.lsp_nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+  utils.lsp_nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+  utils.lsp_nmap('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 end
@@ -718,8 +436,7 @@ local servers = {
       -- diagnostics = { disable = { 'missing-fields' } },
     },
   },
-  tsserver = {},
-  pyright = {},
+  tsserver = {}
 }
 
 -- Setup neovim lua configuration
@@ -775,121 +492,6 @@ require("roslyn").setup({
   capabilities = capabilities
 });
 
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
---
-local lspkind = require 'lspkind'
-local cmp_lsp_types = require 'cmp.types.lsp'
-local is_variableLikeType = function(kind)
-  return kind == cmp_lsp_types.CompletionItemKind.Variable
-      or kind == cmp_lsp_types.CompletionItemKind.Field
-      or kind == cmp_lsp_types.CompletionItemKind.Property
-      or kind == cmp_lsp_types.CompletionItemKind.Unit
-      or kind == cmp_lsp_types.CompletionItemKind.Value
-      or kind == cmp_lsp_types.CompletionItemKind.Constant
-      -- Not exactly sure if these are variable-like. Close enough.
-      or kind == cmp_lsp_types.CompletionItemKind.Enum
-end
-cmp.setup {
-  formatting = {
-    format = lspkind.cmp_format({
-      mode = 'symbol_text', -- show only symbol annotations
-      maxwidth = 50,        -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-      -- can also be a function to dynamically calculate max width such as
-      -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
-      ellipsis_char = '...',    -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-      show_labelDetails = true, -- show labelDetails in menu. Disabled by default
-
-      -- The function below will be called before any actual modifications from lspkind
-      -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
-      before = function(entry, vim_item)
-        return vim_item
-      end,
-      symbol_map = { Copilot = "" }
-    })
-  },
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  completion = {
-    completeopt = 'menu,menuone,noinsert',
-  },
-  mapping = {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<C-y>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-  },
-  sources = {
-    { name = 'copilot' },
-    {
-      name = 'nvim_lsp',
-      entry_filter = function(entry, ctx)
-        return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
-      end,
-    },
-    -- { name = 'luasnip' },
-    { name = 'path' },
-  },
-  sorting = {
-    comparators = {
-      cmp.config.compare.offset,
-      cmp.config.compare.exact,
-      -- cmp.config.compare.scopes,
-      cmp.config.compare.score,
-      cmp.config.compare.recently_used,
-      cmp.config.compare.locality,
-      --cmp.config.compare.kind,
-      --kind: Entires with smaller ordinal value of 'kind' will be ranked higher.
-      ---(see lsp.CompletionItemKind enum).
-      ---Exceptions are that Text(1) will be ranked the lowest, and snippets be the highest.
-      ---@type cmp.ComparatorFunction
-      function(entry1, entry2)
-        local kind1 = entry1:get_kind() --- @type lsp.CompletionItemKind | number
-        local kind2 = entry2:get_kind() --- @type lsp.CompletionItemKind | number
-
-        kind1 = kind1 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind1
-        kind2 = kind2 == cmp_lsp_types.CompletionItemKind.Text and 100 or kind2
-
-        local isKind1VariableLike = is_variableLikeType(kind1);
-        local isKind2VariableLike = is_variableLikeType(kind2);
-        local isBothVariableLike = isKind1VariableLike and isKind2VariableLike;
-
-        if kind1 ~= kind2 and not isBothVariableLike then
-          if is_variableLikeType(kind1) then
-            return true
-          end
-
-          if is_variableLikeType(kind2) then
-            return false
-          end
-
-          local diff = kind1 - kind2
-          if diff < 0 then
-            return true
-          elseif diff > 0 then
-            return false
-          end
-        end
-        return nil
-      end,
-      -- cmp.config.compare.sort_text,
-      cmp.config.compare.length,
-      cmp.config.compare.order,
-    },
-  }
-}
 
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics,
@@ -930,12 +532,6 @@ vim.opt.guicursor = '';
 vim.opt.scrolloff = 4;
 vim.cmd [[set diffopt+=linematch:50]]
 
--- Disable -root of all the evil- arrow keys
-vim.keymap.set({ 'n', 'i', 'v' }, '<Up>', '<Nop>', { silent = true })
-vim.keymap.set({ 'n', 'i', 'v' }, '<Down>', '<Nop>', { silent = true })
-vim.keymap.set({ 'n', 'i', 'v' }, '<Left>', '<Nop>', { silent = true })
-vim.keymap.set({ 'n', 'i', 'v' }, '<Right>', '<Nop>', { silent = true })
-
 vim.fn.sign_define('DiagnosticSignError', { text = '!', texthl = 'DiagnosticSignError' })
 vim.fn.sign_define('DiagnosticSignWarn', { text = '!', texthl = 'DiagnosticSignWarn' })
 vim.fn.sign_define('DiagnosticSignInfo', { text = 'i', texthl = 'DiagnosticSignInfo' })
@@ -945,27 +541,3 @@ vim.fn.sign_define('DiagnosticSignHint', { text = '?', texthl = 'DiagnosticSignH
 
 require('0x000000.remap')
 require('0x000000.keymap')
-
-
-local quickCommit = function()
-  local keys = vim.api.nvim_replace_termcodes(':Git commit -m ""<Left>', false, false, true)
-  vim.api.nvim_feedkeys(keys, "n", {})
-end
-
-local quickCommitWithBranch = function()
-  local branch = vim.system({ "git", "branch", "--show-current" }, { text = true }):wait()
-
-  if branch.code ~= 0 then
-    return
-  end
-
-  -- Remove newline from branch.stdout
-  branch.stdout = string.gsub(branch.stdout, "\n", "")
-
-  local str = ':Git commit -m "' .. branch.stdout .. ' "<Left>';
-  local keys = vim.api.nvim_replace_termcodes(str, true, true, true)
-  vim.api.nvim_feedkeys(keys, "n", {})
-end
-
-vim.keymap.set('n', '<leader>qc', quickCommit, { desc = 'Quick [C]ommit' })
-vim.keymap.set('n', '<leader>qb', quickCommitWithBranch, { desc = 'Quick [C]ommit with [B]ranch' })
