@@ -125,6 +125,7 @@ return {
           },
         },
         tsserver = {},
+        prismals = {},
       }
 
       -- Setup neovim lua configuration
