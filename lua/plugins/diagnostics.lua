@@ -34,4 +34,10 @@ return {
       disable = {},
     },
   },
+  {
+    -- 'dgagn/diagflow.nvim',
+    'ilyasakin/diagflow.nvim',
+    event = 'LspAttach',
+    opts = {},
+  },
 }
