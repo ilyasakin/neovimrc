@@ -1,12 +1,21 @@
 return {
-  'numToStr/Comment.nvim',
-  dependencies = {
-    'JoosepAlviste/nvim-ts-context-commentstring',
+  {
+    'numToStr/Comment.nvim',
+    dependencies = {
+      'JoosepAlviste/nvim-ts-context-commentstring',
+    },
+    event = 'VeryLazy',
+    opts = {
+      pre_hook = function()
+        return vim.bo.commentstring
+      end,
+    },
+    enabled = vim.fn.exists("nvim-0.10.0") == 0,
   },
-  event = 'VeryLazy',
-  opts = {
-    pre_hook = function()
-      return vim.bo.commentstring
-    end,
-  },
+  {
+    "folke/ts-comments.nvim",
+    opts = {},
+    event = "VeryLazy",
+    enabled = vim.fn.has("nvim-0.10.0") == 1,
+  }
 }
