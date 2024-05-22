@@ -35,8 +35,7 @@ return {
     },
   },
   {
-    -- 'dgagn/diagflow.nvim',
-    'ilyasakin/diagflow.nvim',
+    'dgagn/diagflow.nvim',
     event = 'LspAttach',
     opts = {},
   },
