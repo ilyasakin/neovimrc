@@ -1,14 +1,8 @@
 return {
-  {
-    'Darazaki/indent-o-matic',
-    opts = {},
-  },
+  { 'tpope/vim-sleuth' },
 
   {
-    -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
     main = 'ibl',
     opts = {},
   },
@@ -34,7 +28,6 @@ return {
 
   {
     'kylechui/nvim-surround',
-    version = '*', -- Use for stability; omit to use `main` branch for the latest features
     event = 'VeryLazy',
     opts = {},
   },
