@@ -29,7 +29,7 @@
   "nvim-nio": { "branch": "master", "commit": "632024157d01e8bc48fd7df6a7de8ffe3fdd4f3a" },
   "nvim-surround": { "branch": "main", "commit": "79aaa42da1f698ed31bcbe7f83081f69dca7ba17" },
   "nvim-treesitter": { "branch": "master", "commit": "30de5e7e9486fb1b1b8c2a1e71052b13f94f1cb0" },
-  "nvim-ts-autotag": { "branch": "main", "commit": "62db4b3054ec6847e5cb189b4dea452ce0c7ad7f" },
+  "nvim-ts-autotag": { "branch": "main", "commit": "8ae54b90e36ef1fc5267214b30c2cbff71525fe4" },
   "nvim-web-devicons": { "branch": "master", "commit": "e37bb1feee9e7320c76050a55443fa843b4b6f83" },
   "plenary.nvim": { "branch": "master", "commit": "a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683" },
   "rose-pine": { "branch": "main", "commit": "b6fe88c3282cf9f117a3e836d761c2d78d02f417" },
