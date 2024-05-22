@@ -10,7 +10,7 @@ return {
         return vim.bo.commentstring
       end,
     },
-    enabled = vim.fn.exists("nvim-0.10.0") == 0,
+    enabled = vim.fn.has("nvim-0.10.0") == 0,
   },
   {
     "folke/ts-comments.nvim",
