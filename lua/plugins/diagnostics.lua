@@ -39,4 +39,15 @@ return {
     event = 'LspAttach',
     opts = {},
   },
+
+  {
+    'dmmulroy/tsc.nvim',
+    dependencies = { 'folke/trouble.nvim' },
+    opts =
+    {
+      run_as_monorepo = true,
+      use_trouble_qflist = true,
+    }
+  }
+
 }
