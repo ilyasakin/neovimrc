@@ -89,7 +89,7 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      'jmederosalvarado/roslyn.nvim',
+      'ilyasakin/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim', opts = {} },
       'folke/neodev.nvim',
