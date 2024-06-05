@@ -3,9 +3,11 @@ return {
   'nvim-treesitter/nvim-treesitter',
   dependencies = {
     'windwp/nvim-ts-autotag',
+    'LiadOz/nvim-dap-repl-highlights'
   },
   build = ':TSUpdate',
   config = function()
+    require('nvim-dap-repl-highlights').setup();
     require('nvim-treesitter.configs').setup {
       -- Add languages to be installed here that you want installed for treesitter
       ensure_installed = {
@@ -15,6 +17,7 @@ return {
         'cpp',
         'css',
         'csv',
+        'dap_repl',
         'dockerfile',
         'git_config',
         'git_rebase',
