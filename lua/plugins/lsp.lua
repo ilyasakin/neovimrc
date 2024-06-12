@@ -53,8 +53,6 @@ local setup_lsp_handlers = function()
 end
 
 local on_attach = function(client, bufnr)
-  vim.highlight.priorities.semantic_tokens = 95
-
   local utils = require 'utils'
 
   if client.server_capabilities.inlayHintProvider then
