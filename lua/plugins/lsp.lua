@@ -101,7 +101,7 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      'ilyasakin/roslyn.nvim',
+      -- 'ilyasakin/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
@@ -188,10 +188,11 @@ return {
         end,
       }
 
-      require('roslyn').setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      }
+				--   require('roslyn').setup {
+				-- roslyn_version = "4.11.0-1.24209.10",
+				--     on_attach = on_attach,
+				--     capabilities = capabilities,
+				--   }
     end,
   },
   {
