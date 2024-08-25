@@ -4,10 +4,10 @@ local setup_lsp_handlers = function()
   -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
   local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
   vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(
-    err,
-    result,
-    ctx,
-    config
+      err,
+      result,
+      ctx,
+      config
   )
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if client and client.name == 'typescript-tools' then
@@ -25,35 +25,36 @@ local setup_lsp_handlers = function()
   end
 
   vim.lsp.handlers['textDocument/publishDiagnostics'] =
-    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-      underline = {
-        severity = { min = vim.diagnostic.severity.ERROR },
-      },
-      signs = {
-        severity = { min = vim.diagnostic.severity.ERROR },
-        text = {
-          [vim.diagnostic.severity.ERROR] = '!',
-          [vim.diagnostic.severity.WARN] = '!',
-          [vim.diagnostic.severity.INFO] = 'i',
-          [vim.diagnostic.severity.HINT] = '?',
+      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+        underline = {
+          severity = { min = vim.diagnostic.severity.ERROR },
         },
-        texthl = {
-          [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
-          [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
-          [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
-          [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
+        signs = {
+          severity = { min = vim.diagnostic.severity.ERROR },
+          text = {
+            [vim.diagnostic.severity.ERROR] = '!',
+            [vim.diagnostic.severity.WARN] = '!',
+            [vim.diagnostic.severity.INFO] = 'i',
+            [vim.diagnostic.severity.HINT] = '?',
+          },
+          texthl = {
+            [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
+            [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
+            [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
+            [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
+          },
         },
-      },
-      virtual_text = {
-        spacing = 5,
-        severity = { min = vim.diagnostic.severity.ERROR },
-      },
-      update_in_insert = false,
-    })
+        virtual_text = {
+          spacing = 5,
+          severity = { min = vim.diagnostic.severity.ERROR },
+        },
+        update_in_insert = false,
+      })
 end
 
 local on_attach = function(client, bufnr)
   local utils = require 'utils'
+  client.server_capabilities.semanticTokensProvider = vim.NIL
 
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(true)
@@ -101,9 +102,9 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      'ilyasakin/roslyn.nvim',
+      'seblj/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
       'hrsh7th/nvim-cmp',
       'nvim-java/nvim-java',
@@ -153,6 +154,7 @@ return {
       )
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
       capabilities.textDocument.completion.completionItem.snippetSupport = false
+      capabilities.textDocument.semanticTokens = nil
 
       -- Ensure the servers above are installed
       local mason_lspconfig = require 'mason-lspconfig'

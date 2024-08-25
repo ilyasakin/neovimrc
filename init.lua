@@ -42,9 +42,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
+  require 'plugins.which-key',
   require 'plugins.completion',
   require 'plugins.lsp',
-  require 'plugins.which-key',
   require 'plugins.git',
   require 'plugins.theme',
   require 'plugins.statusline',
