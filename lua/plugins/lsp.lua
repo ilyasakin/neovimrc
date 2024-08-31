@@ -153,7 +153,7 @@ return {
         require('cmp_nvim_lsp').default_capabilities()
       )
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
-      capabilities.textDocument.completion.completionItem.snippetSupport = false
+      -- capabilities.textDocument.completion.completionItem.snippetSupport = false
       capabilities.textDocument.semanticTokens = nil
 
       -- Ensure the servers above are installed
