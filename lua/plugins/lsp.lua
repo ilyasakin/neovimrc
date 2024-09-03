@@ -4,10 +4,10 @@ local setup_lsp_handlers = function()
   -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
   local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
   vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(
-      err,
-      result,
-      ctx,
-      config
+    err,
+    result,
+    ctx,
+    config
   )
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if client and client.name == 'typescript-tools' then
@@ -25,31 +25,31 @@ local setup_lsp_handlers = function()
   end
 
   vim.lsp.handlers['textDocument/publishDiagnostics'] =
-      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-        underline = {
-          severity = { min = vim.diagnostic.severity.ERROR },
+    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+      underline = {
+        severity = { min = vim.diagnostic.severity.ERROR },
+      },
+      signs = {
+        severity = { min = vim.diagnostic.severity.ERROR },
+        text = {
+          [vim.diagnostic.severity.ERROR] = '!',
+          [vim.diagnostic.severity.WARN] = '!',
+          [vim.diagnostic.severity.INFO] = 'i',
+          [vim.diagnostic.severity.HINT] = '?',
         },
-        signs = {
-          severity = { min = vim.diagnostic.severity.ERROR },
-          text = {
-            [vim.diagnostic.severity.ERROR] = '!',
-            [vim.diagnostic.severity.WARN] = '!',
-            [vim.diagnostic.severity.INFO] = 'i',
-            [vim.diagnostic.severity.HINT] = '?',
-          },
-          texthl = {
-            [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
-            [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
-            [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
-            [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
-          },
+        texthl = {
+          [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
+          [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
+          [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
+          [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
         },
-        virtual_text = {
-          spacing = 5,
-          severity = { min = vim.diagnostic.severity.ERROR },
-        },
-        update_in_insert = false,
-      })
+      },
+      virtual_text = {
+        spacing = 5,
+        severity = { min = vim.diagnostic.severity.ERROR },
+      },
+      update_in_insert = false,
+    })
 end
 
 local on_attach = function(client, bufnr)
@@ -61,9 +61,7 @@ local on_attach = function(client, bufnr)
   end
 
   utils.lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  utils.lsp_nmap('<leader>ca', function()
-    vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
-  end, '[C]ode [A]ction')
+  utils.lsp_nmap('<leader>ca', require('tiny-code-action').code_action, '[C]ode [A]ction')
 
   utils.lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   utils.lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -104,13 +102,14 @@ return {
       { 'williamboman/mason.nvim', config = true },
       'seblj/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
       'folke/neodev.nvim',
       'hrsh7th/nvim-cmp',
       'nvim-java/nvim-java',
+      'rachartier/tiny-code-action.nvim',
     },
     config = function()
-      require 'java'.setup()
+      require('java').setup()
       setup_lsp_handlers()
       require('mason').setup()
       require('mason-lspconfig').setup()
@@ -141,7 +140,7 @@ return {
         },
         tsserver = {},
         prismals = {},
-        jdtls = {}
+        jdtls = {},
       }
 
       -- Setup neovim lua configuration
@@ -202,5 +201,16 @@ return {
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  },
+  {
+    'rachartier/tiny-code-action.nvim',
+    dependencies = {
+      { 'nvim-lua/plenary.nvim' },
+      { 'nvim-telescope/telescope.nvim' },
+    },
+    event = 'LspAttach',
+    config = function()
+      require('tiny-code-action').setup()
+    end,
   },
 }
