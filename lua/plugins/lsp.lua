@@ -194,8 +194,10 @@ return {
       }
 
       require('roslyn').setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
+        config = {
+          capabilities = capabilities,
+          on_attach = on_attach,
+        }
       }
     end,
   },
