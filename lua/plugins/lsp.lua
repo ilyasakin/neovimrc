@@ -196,6 +196,7 @@ return {
         config = {
           capabilities = capabilities,
           on_attach = on_attach,
+          filetypes = { 'cs' },
           settings = {
             ["csharp|inlay_hints"] = {
               csharp_enable_inlay_hints_for_implicit_object_creation = true,
