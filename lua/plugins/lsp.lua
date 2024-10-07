@@ -4,10 +4,10 @@ local setup_lsp_handlers = function()
   -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
   local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
   vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(
-    err,
-    result,
-    ctx,
-    config
+      err,
+      result,
+      ctx,
+      config
   )
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if client and client.name == 'typescript-tools' then
@@ -25,31 +25,31 @@ local setup_lsp_handlers = function()
   end
 
   vim.lsp.handlers['textDocument/publishDiagnostics'] =
-    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-      underline = {
-        severity = { min = vim.diagnostic.severity.ERROR },
-      },
-      signs = {
-        severity = { min = vim.diagnostic.severity.ERROR },
-        text = {
-          [vim.diagnostic.severity.ERROR] = '!',
-          [vim.diagnostic.severity.WARN] = '!',
-          [vim.diagnostic.severity.INFO] = 'i',
-          [vim.diagnostic.severity.HINT] = '?',
+      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+        underline = {
+          severity = { min = vim.diagnostic.severity.ERROR },
         },
-        texthl = {
-          [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
-          [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
-          [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
-          [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
+        signs = {
+          severity = { min = vim.diagnostic.severity.ERROR },
+          text = {
+            [vim.diagnostic.severity.ERROR] = '!',
+            [vim.diagnostic.severity.WARN] = '!',
+            [vim.diagnostic.severity.INFO] = 'i',
+            [vim.diagnostic.severity.HINT] = '?',
+          },
+          texthl = {
+            [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
+            [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
+            [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
+            [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
+          },
         },
-      },
-      virtual_text = {
-        spacing = 5,
-        severity = { min = vim.diagnostic.severity.ERROR },
-      },
-      update_in_insert = false,
-    })
+        virtual_text = {
+          spacing = 5,
+          severity = { min = vim.diagnostic.severity.ERROR },
+        },
+        update_in_insert = false,
+      })
 end
 
 local function enable_full_semantic_tokens(client)
@@ -155,11 +155,12 @@ return {
       { 'williamboman/mason.nvim', config = true },
       'seblj/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
-      'hrsh7th/nvim-cmp',
+      "iguanacucumber/magazine.nvim",
       'nvim-java/nvim-java',
       'rachartier/tiny-code-action.nvim',
+      'https://gitlab.com/schrieveslaach/sonarlint.nvim'
     },
     config = function()
       require('java').setup()
@@ -248,27 +249,47 @@ return {
           capabilities = capabilities,
           on_attach = on_attach,
           filetypes = { 'cs' },
-          settings = {
-            ['csharp|inlay_hints'] = {
-              csharp_enable_inlay_hints_for_implicit_object_creation = true,
-              csharp_enable_inlay_hints_for_implicit_variable_types = true,
-              csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-              csharp_enable_inlay_hints_for_types = true,
-              dotnet_enable_inlay_hints_for_indexer_parameters = true,
-              dotnet_enable_inlay_hints_for_literal_parameters = true,
-              dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-              dotnet_enable_inlay_hints_for_other_parameters = true,
-              dotnet_enable_inlay_hints_for_parameters = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-            },
-            ['csharp|code_lens'] = {
-              dotnet_enable_references_code_lens = true,
-            },
-          },
+          -- settings = {
+          --   ['csharp|inlay_hints'] = {
+          --     csharp_enable_inlay_hints_for_implicit_object_creation = true,
+          --     csharp_enable_inlay_hints_for_implicit_variable_types = true,
+          --     csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+          --     csharp_enable_inlay_hints_for_types = true,
+          --     dotnet_enable_inlay_hints_for_indexer_parameters = true,
+          --     dotnet_enable_inlay_hints_for_literal_parameters = true,
+          --     dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+          --     dotnet_enable_inlay_hints_for_other_parameters = true,
+          --     dotnet_enable_inlay_hints_for_parameters = true,
+          --     dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+          --     dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+          --     dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+          --   },
+          --   ['csharp|code_lens'] = {
+          --     dotnet_enable_references_code_lens = true,
+          --   },
+          -- },
         },
       }
+
+      -- require('sonarlint').setup({
+      --   server = {
+      --     cmd = {
+      --       'sonarlint-language-server',
+      --       -- Ensure that sonarlint-language-server uses stdio channel
+      --       '-stdio',
+      --       '-analyzers',
+      --       vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarjs.jar"),
+      --       vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarlintomnisharp.jar"),
+      --     }
+      --   },
+      --   filetypes = {
+      --     'javascript',
+      --     'javascriptreact',
+      --     'typescript',
+      --     'typescriptreact',
+      --     'cs'
+      --   }
+      -- })
     end,
   },
   {

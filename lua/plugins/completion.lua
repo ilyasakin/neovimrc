@@ -1,6 +1,8 @@
 return {
   -- Autocompletion
-  'hrsh7th/nvim-cmp',
+  -- 'hrsh7th/nvim-cmp',
+  "iguanacucumber/magazine.nvim",
+  name = "nvim-cmp", -- Otherwise highlighting gets messed up
   dependencies = {
     -- Snippet Engine & its associated nvim-cmp source
     {
@@ -35,22 +37,22 @@ return {
     local cmp_lsp_types = require 'cmp.types.lsp'
     local is_variableLikeType = function(kind)
       return kind == cmp_lsp_types.CompletionItemKind.Variable
-        or kind == cmp_lsp_types.CompletionItemKind.Field
-        or kind == cmp_lsp_types.CompletionItemKind.Property
-        or kind == cmp_lsp_types.CompletionItemKind.Unit
-        or kind == cmp_lsp_types.CompletionItemKind.Value
-        or kind == cmp_lsp_types.CompletionItemKind.Constant
-        -- Not exactly sure if these are variable-like. Close enough.
-        or kind == cmp_lsp_types.CompletionItemKind.Enum
+          or kind == cmp_lsp_types.CompletionItemKind.Field
+          or kind == cmp_lsp_types.CompletionItemKind.Property
+          or kind == cmp_lsp_types.CompletionItemKind.Unit
+          or kind == cmp_lsp_types.CompletionItemKind.Value
+          or kind == cmp_lsp_types.CompletionItemKind.Constant
+          -- Not exactly sure if these are variable-like. Close enough.
+          or kind == cmp_lsp_types.CompletionItemKind.Enum
     end
     cmp.setup {
       formatting = {
         format = lspkind.cmp_format {
           mode = 'symbol_text', -- show only symbol annotations
-          maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+          maxwidth = 50,        -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
           -- can also be a function to dynamically calculate max width such as
           -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
-          ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+          ellipsis_char = '...',    -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
           show_labelDetails = true, -- show labelDetails in menu. Disabled by default
 
           -- The function below will be called before any actual modifications from lspkind
