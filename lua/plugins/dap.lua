@@ -7,6 +7,7 @@ return {
       'theHamsta/nvim-dap-virtual-text',
       'rcarriga/nvim-dap-ui',
     },
+    lazy = true,
     keys = {
       {
         '<leader>dc',
@@ -89,7 +90,7 @@ return {
       'mfussenegger/nvim-dap',
       'nvim-neotest/nvim-nio',
     },
-
+    lazy = true,
     opts = {},
     keys = {
       {
