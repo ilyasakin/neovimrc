@@ -90,6 +90,7 @@ return {
             return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
           end,
         },
+        { name = "vim-dadbod-completion" },
         -- { name = 'luasnip' },
         { name = 'path' },
       },

@@ -56,6 +56,7 @@ require('lazy').setup({
   require 'plugins.format',
   require 'plugins.copilot',
   require 'plugins.dap',
+  require 'plugins.db'
 }, {})
 
 require 'remap'
