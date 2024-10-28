@@ -60,7 +60,7 @@ return {
           before = function(entry, vim_item)
             return vim_item
           end,
-          symbol_map = { Copilot = '' },
+          symbol_map = { Copilot = '', Supermaven = '' },
         },
       },
       snippet = {
@@ -84,6 +84,7 @@ return {
       },
       sources = {
         { name = 'copilot' },
+        { name = 'supermaven' },
         {
           name = 'nvim_lsp',
           entry_filter = function(entry, ctx)

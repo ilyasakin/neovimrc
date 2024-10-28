@@ -55,6 +55,7 @@ require('lazy').setup({
   require 'plugins.editor',
   require 'plugins.format',
   require 'plugins.copilot',
+  require 'plugins.supermaven',
   require 'plugins.dap',
   require 'plugins.db'
 }, {})
