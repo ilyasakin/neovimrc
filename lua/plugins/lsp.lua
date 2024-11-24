@@ -101,17 +101,15 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      'seblj/roslyn.nvim',
+      { 'seblj/roslyn.nvim', commit = 'dc1193ef940ec446c0e5a6bf4c5b9f36175a65e1' },
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
       "iguanacucumber/magazine.nvim",
-      'nvim-java/nvim-java',
       'rachartier/tiny-code-action.nvim',
       'https://gitlab.com/schrieveslaach/sonarlint.nvim'
     },
     config = function()
-      require('java').setup()
       setup_lsp_handlers()
       require('mason').setup()
       require('mason-lspconfig').setup()
@@ -141,7 +139,6 @@ return {
           },
         },
         prismals = {},
-        jdtls = {},
       }
 
       -- Setup neovim lua configuration
@@ -197,25 +194,12 @@ return {
           capabilities = capabilities,
           on_attach = on_attach,
           filetypes = { 'cs' },
-          -- settings = {
-          --   ['csharp|inlay_hints'] = {
-          --     csharp_enable_inlay_hints_for_implicit_object_creation = true,
-          --     csharp_enable_inlay_hints_for_implicit_variable_types = true,
-          --     csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-          --     csharp_enable_inlay_hints_for_types = true,
-          --     dotnet_enable_inlay_hints_for_indexer_parameters = true,
-          --     dotnet_enable_inlay_hints_for_literal_parameters = true,
-          --     dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-          --     dotnet_enable_inlay_hints_for_other_parameters = true,
-          --     dotnet_enable_inlay_hints_for_parameters = true,
-          --     dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-          --     dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-          --     dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-          --   },
-          --   ['csharp|code_lens'] = {
-          --     dotnet_enable_references_code_lens = true,
-          --   },
-          -- },
+          settings = {
+            ["csharp|background_analysis"] = {
+              dotnet_analyzer_diagnostics_scope = "openFiles",
+              dotnet_compiler_diagnostics_scope = "fullSolution",
+            },
+          },
         },
       }
 
