@@ -23,6 +23,7 @@ vim.opt.wrap = false
 vim.opt.guicursor = ''
 vim.opt.scrolloff = 4
 vim.opt.diffopt = vim.opt.diffopt + 'linematch:50'
+vim.opt.conceallevel = 2
 
 vim.loader.enable()
 
@@ -57,7 +58,8 @@ require('lazy').setup({
   require 'plugins.copilot',
   require 'plugins.supermaven',
   require 'plugins.dap',
-  require 'plugins.db'
+  require 'plugins.db',
+  require 'plugins.obsidian'
 }, {})
 
 require 'remap'
