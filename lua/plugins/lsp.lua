@@ -101,7 +101,7 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      { 'seblj/roslyn.nvim', commit = 'dc1193ef940ec446c0e5a6bf4c5b9f36175a65e1' },
+      'seblj/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
