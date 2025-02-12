@@ -24,6 +24,7 @@ local setup_lsp_handlers = function()
     inlay_hint_handler(err, result, ctx, config)
   end
 
+  -- Optimize diagnostic updates
   vim.lsp.handlers['textDocument/publishDiagnostics'] =
       vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
         underline = {
@@ -49,16 +50,69 @@ local setup_lsp_handlers = function()
           severity = { min = vim.diagnostic.severity.ERROR },
         },
         update_in_insert = false,
+        severity_sort = true,
+        float = {
+          header = '',
+          source = 'if_many',
+          border = 'rounded',
+          max_width = 100,
+        },
       })
+
+  -- Debounce progress updates
+  local progress = {}
+  local function progress_handler(_, result, ctx)
+    local client_id = ctx.client_id
+    local client = vim.lsp.get_client_by_id(client_id)
+    if not client then
+      return
+    end
+
+    local val = result.value
+    if not val.kind then
+      return
+    end
+
+    if val.kind == 'begin' then
+      progress[client_id] = {
+        title = val.title,
+        message = val.message,
+        percentage = val.percentage,
+        spinner = 1,
+      }
+    elseif val.kind == 'report' then
+      progress[client_id] = {
+        title = progress[client_id].title,
+        message = val.message,
+        percentage = val.percentage,
+        spinner = progress[client_id].spinner + 1,
+      }
+    elseif val.kind == 'end' then
+      progress[client_id] = nil
+    end
+  end
+
+  vim.lsp.handlers['$/progress'] = progress_handler
 end
 
 local on_attach = function(client, bufnr)
+  -- Disable semantic tokens for better performance
   client.server_capabilities.semanticTokensProvider = nil
 
   local utils = require 'utils'
 
+  -- Enable inlay hints only for specific file types
   if client.server_capabilities.inlayHintProvider then
-    vim.lsp.inlay_hint.enable(true)
+    local enable_inlay_hints = {
+      typescript = true,
+      javascript = true,
+      typescriptreact = true,
+      javascriptreact = true,
+      rust = true,
+    }
+    if enable_inlay_hints[vim.bo[bufnr].filetype] then
+      vim.lsp.inlay_hint.enable(bufnr, true)
+    end
   end
 
   utils.lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -83,11 +137,9 @@ local on_attach = function(client, bufnr)
     '[W]orkspace [S]ymbols'
   )
 
-  -- See `:help K` for why this keymap
   utils.lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   utils.lsp_nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
-  -- Lesser used LSP functionality
   utils.lsp_nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
   utils.lsp_nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   utils.lsp_nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
@@ -123,19 +175,76 @@ return {
       --  If you want to override the default filetypes that your language server will attach to you can
       --  define the property 'filetypes' to the map in question.
       local servers = {
-        clangd = {},
-        gopls = {},
-        pyright = {},
-        rust_analyzer = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--header-insertion=never',
+            '--completion-style=detailed',
+            '--function-arg-placeholders',
+          },
+        },
+        gopls = {
+          analyses = {
+            unusedparams = true,
+          },
+          staticcheck = true,
+          gofumpt = true,
+          usePlaceholders = true,
+          hints = {
+            assignVariableTypes = true,
+            compositeLiteralFields = true,
+            compositeLiteralTypes = true,
+            constantValues = true,
+            functionTypeParameters = true,
+            parameterNames = true,
+            rangeVariableTypes = true,
+          },
+        },
+        pyright = {
+          analysis = {
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+            diagnosticMode = 'openFilesOnly',
+          },
+        },
+        rust_analyzer = {
+          cargo = {
+            allFeatures = true,
+            loadOutDirsFromCheck = true,
+            runBuildScripts = true,
+          },
+          checkOnSave = {
+            allFeatures = true,
+            command = 'clippy',
+            extraArgs = { '--no-deps' },
+          },
+          procMacro = {
+            enable = true,
+            ignored = {
+              ['async-trait'] = { 'async_trait' },
+              ['napi-derive'] = { 'napi' },
+              ['async-recursion'] = { 'async_recursion' },
+            },
+          },
+        },
         html = { filetypes = { 'html', 'twig', 'hbs' } },
         cssls = { filetypes = { 'css', 'scss', 'less', 'sass' } },
         lua_ls = {
           Lua = {
-            workspace = { checkThirdParty = false },
+            workspace = {
+              checkThirdParty = false,
+              library = {
+                '${3rd}/luv/library',
+                unpack(vim.api.nvim_get_runtime_file('', true)),
+              },
+            },
+            completion = {
+              callSnippet = 'Replace',
+            },
             telemetry = { enable = false },
             hint = { enable = true },
-            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-            -- diagnostics = { disable = { 'missing-fields' } },
           },
         },
         prismals = {},
@@ -144,13 +253,33 @@ return {
       -- Setup neovim lua configuration
       require('neodev').setup()
 
+      -- Optimize capabilities
       local capabilities = vim.tbl_deep_extend(
         'force',
         vim.lsp.protocol.make_client_capabilities(),
-        require('cmp_nvim_lsp').default_capabilities()
+        require('cmp_nvim_lsp').default_capabilities(),
+        {
+          workspace = {
+            didChangeWatchedFiles = {
+              dynamicRegistration = false,
+            },
+          },
+          textDocument = {
+            foldingRange = {
+              dynamicRegistration = false,
+              lineFoldingOnly = true,
+            },
+            completion = {
+              completionItem = {
+                snippetSupport = false,
+                commitCharactersSupport = false,
+                deprecatedSupport = false,
+                preselectSupport = false,
+              },
+            },
+          },
+        }
       )
-      capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
-      -- capabilities.textDocument.completion.completionItem.snippetSupport = false
 
       -- Ensure the servers above are installed
       local mason_lspconfig = require 'mason-lspconfig'
