@@ -70,8 +70,7 @@ require('lazy').setup({
   require 'plugins.copilot',
   require 'plugins.supermaven',
   require 'plugins.dap',
-  require 'plugins.db',
-  require 'plugins.obsidian'
+  require 'plugins.db'
 }, {})
 
 require 'remap'

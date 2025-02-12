@@ -164,8 +164,7 @@ return {
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
       "iguanacucumber/magazine.nvim",
-      'rachartier/tiny-code-action.nvim',
-      'https://gitlab.com/schrieveslaach/sonarlint.nvim'
+      'rachartier/tiny-code-action.nvim'
     },
     config = function()
       setup_lsp_handlers()
@@ -337,26 +336,6 @@ return {
           },
         },
       }
-
-      -- require('sonarlint').setup({
-      --   server = {
-      --     cmd = {
-      --       'sonarlint-language-server',
-      --       -- Ensure that sonarlint-language-server uses stdio channel
-      --       '-stdio',
-      --       '-analyzers',
-      --       vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarjs.jar"),
-      --       vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarlintomnisharp.jar"),
-      --     }
-      --   },
-      --   filetypes = {
-      --     'javascript',
-      --     'javascriptreact',
-      --     'typescript',
-      --     'typescriptreact',
-      --     'cs'
-      --   }
-      -- })
     end,
   },
   {
