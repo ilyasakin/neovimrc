@@ -24,8 +24,20 @@ vim.opt.guicursor = ''
 vim.opt.scrolloff = 4
 vim.opt.diffopt = vim.opt.diffopt + 'linematch:50'
 vim.opt.conceallevel = 2
+vim.opt.hidden = true
+vim.opt.history = 100
+vim.opt.synmaxcol = 240
+vim.g.did_install_default_menus = 1
+vim.g.did_install_syntax_menu = 1
 
 vim.loader.enable()
+
+-- Disable unused providers
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+
+-- Set Python provider to use our virtual environment
+vim.g.python3_host_prog = vim.fn.expand('~/.config/nvim/venv/bin/python3')
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'

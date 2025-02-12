@@ -1,4 +1,12 @@
 local setup_lsp_handlers = function()
+  -- Configure LSP logging
+  vim.lsp.set_log_level("ERROR")
+  local log_path = vim.fn.stdpath("log") .. "/lsp.log"
+  vim.lsp.set_log_level("ERROR")
+  if vim.fn.filereadable(log_path) == 1 then
+    os.remove(log_path)
+  end
+
   -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
   -- Workaround for truncating long TypeScript inlay hints.
   -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
