@@ -81,22 +81,24 @@ local setup_lsp_handlers = function()
       return
     end
 
-    if val.kind == 'begin' then
-      progress[client_id] = {
-        title = val.title,
-        message = val.message,
-        percentage = val.percentage,
-        spinner = 1,
-      }
-    elseif val.kind == 'report' then
-      progress[client_id] = {
-        title = progress[client_id].title,
-        message = val.message,
-        percentage = val.percentage,
-        spinner = progress[client_id].spinner + 1,
-      }
-    elseif val.kind == 'end' then
-      progress[client_id] = nil
+    if progress[client_id] then
+      if val.kind == 'begin' then
+        progress[client_id] = {
+          title = val.title,
+          message = val.message,
+          percentage = val.percentage,
+          spinner = 1,
+        }
+      elseif val.kind == 'report' then
+        progress[client_id] = {
+          title = progress[client_id].title,
+          message = val.message,
+          percentage = val.percentage,
+          spinner = progress[client_id].spinner + 1,
+        }
+      elseif val.kind == 'end' then
+        progress[client_id] = nil
+      end
     end
   end
 

@@ -7,15 +7,16 @@ function M.map(mode, keys, func, desc, opts)
   opts.desc = desc
   opts.remap = opts.noremap == false
 
-  if type(func) == 'string' then
-    vim.keymap.set(mode, keys, func, opts)
-  else
-    wk.register({
-      { keys, func, buffer = opts.buffer, desc = desc, remap = opts.remap },
-    }, {
+  wk.add({
+    {
+      keys,
+      func,
+      buffer = opts.buffer,
+      desc = desc,
+      remap = opts.remap,
       mode = mode,
-    })
-  end
+    }
+  })
 end
 
 M.nmap = function(keys, func, desc, opts)
