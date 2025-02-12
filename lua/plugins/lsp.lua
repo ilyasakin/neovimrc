@@ -96,12 +96,10 @@ local setup_lsp_handlers = function()
 end
 
 local on_attach = function(client, bufnr)
-  -- Disable semantic tokens for better performance
   client.server_capabilities.semanticTokensProvider = nil
 
   local utils = require 'utils'
 
-  -- Enable inlay hints only for specific file types
   if client.server_capabilities.inlayHintProvider then
     local enable_inlay_hints = {
       typescript = true,
@@ -111,7 +109,7 @@ local on_attach = function(client, bufnr)
       rust = true,
     }
     if enable_inlay_hints[vim.bo[bufnr].filetype] then
-      vim.lsp.inlay_hint.enable(bufnr, true)
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
     end
   end
 
