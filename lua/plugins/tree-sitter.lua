@@ -58,13 +58,21 @@ return {
       modules = {},
       highlight = {
         enable = true,
+        disable = function(_, bufnr)
+          return vim.api.nvim_buf_line_count(bufnr) > 10000
+        end,
         additional_vim_regex_highlighting = false,
       },
       autotag = {
         enable = true,
+        enable_rename = true,
+        enable_close = true,
+        enable_close_on_slash = true,
+        filetypes = { 'html', 'xml', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'tsx', 'jsx' },
       },
       indent = {
         enable = true,
+        disable = { 'yaml' },
       },
       incremental_selection = {
         enable = true,
@@ -74,6 +82,10 @@ return {
           scope_incremental = '<c-s>',
           node_decremental = '<M-space>',
         },
+      },
+      matchup = {
+        enable = true,
+        disable = {},
       },
     }
   end,
