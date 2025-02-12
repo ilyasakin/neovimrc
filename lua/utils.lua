@@ -5,17 +5,15 @@ function M.map(mode, keys, func, desc, opts)
   opts = opts or {}
   opts.silent = opts.silent ~= false
   opts.desc = desc
+  opts.remap = opts.noremap == false
 
   if type(func) == 'string' then
     vim.keymap.set(mode, keys, func, opts)
   else
     wk.register({
-      [keys] = { func, desc },
+      { keys, func, buffer = opts.buffer, desc = desc, remap = opts.remap },
     }, {
       mode = mode,
-      silent = opts.silent,
-      noremap = opts.noremap ~= false,
-      buffer = opts.buffer,
     })
   end
 end
@@ -32,10 +30,16 @@ M.imap = function(keys, func, desc, opts)
   M.map('i', keys, func, desc, opts)
 end
 
-M.lsp_nmap = function(keys, func, desc, opts)
-  opts = opts or {}
-  opts.buffer = true
-  M.nmap(keys, func, 'LSP: ' .. desc, opts)
+function M.lsp_nmap(keys, func, desc)
+  M.map('n', keys, func, 'LSP: ' .. desc, { buffer = true })
+end
+
+function M.lsp_vmap(keys, func, desc)
+  M.map('v', keys, func, 'LSP: ' .. desc, { buffer = true })
+end
+
+function M.lsp_imap(keys, func, desc)
+  M.map('i', keys, func, 'LSP: ' .. desc, { buffer = true })
 end
 
 function M.notify_error(msg, opts)
