@@ -1,14 +1,41 @@
 local M = {}
-local wk = require('which-key')
+local wk = require 'which-key'
 
-M.lsp_nmap = function(keys, func, desc)
-  if desc then
-    desc = 'LSP: ' .. desc
+function M.map(mode, keys, func, desc, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  opts.desc = desc
+
+  if type(func) == 'string' then
+    vim.keymap.set(mode, keys, func, opts)
+  else
+    wk.register({
+      [keys] = { func, desc },
+    }, {
+      mode = mode,
+      silent = opts.silent,
+      noremap = opts.noremap ~= false,
+      buffer = opts.buffer,
+    })
   end
+end
 
-  wk.add({
-    { keys, func, desc = desc, mode = 'n' }
-  })
+M.nmap = function(keys, func, desc, opts)
+  M.map('n', keys, func, desc, opts)
+end
+
+M.vmap = function(keys, func, desc, opts)
+  M.map('v', keys, func, desc, opts)
+end
+
+M.imap = function(keys, func, desc, opts)
+  M.map('i', keys, func, desc, opts)
+end
+
+M.lsp_nmap = function(keys, func, desc, opts)
+  opts = opts or {}
+  opts.buffer = true
+  M.nmap(keys, func, 'LSP: ' .. desc, opts)
 end
 
 function M.notify_error(msg, opts)
@@ -38,6 +65,13 @@ end
 
 function M.is_windows()
   return vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1
+end
+
+function M.get_os_command(commands)
+  if M.is_windows() then
+    return commands.windows
+  end
+  return commands.unix
 end
 
 return M

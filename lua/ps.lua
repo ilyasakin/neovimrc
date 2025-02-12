@@ -14,15 +14,14 @@ function M.pick()
     return nil
   end
 
-  local input
-  if utils.is_windows() then
-    input = { 'powershell', '-NoProfile', '-Command', 'Get-Process | Select-Object Id, ProcessName, CommandLine | Format-Table -AutoSize' }
-  else
-    input = { 'ps', 'ax', '-o', 'pid=,comm=,args=' }
-  end
+  local input = utils.get_os_command {
+    windows = { 'powershell', '-NoProfile', '-Command', 'Get-Process | Select-Object Id, ProcessName, CommandLine | Format-Table -AutoSize' },
+    unix = { 'ps', 'ax', '-o', 'pid=,comm=,args=' },
+  }
 
   local opts = {
     prompt_title = 'Select Process',
+    preview_title = 'Process Information',
     finder = telescope.finders.new_oneshot_job(input, {
       entry_maker = function(line)
         if not line or line == '' then
