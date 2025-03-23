@@ -19,6 +19,13 @@ function M.pick()
     unix = { 'ps', 'ax', '-o', 'pid=,comm=,args=' },
   }
 
+  local co = coroutine.running()
+  
+  M._callback = function(selection)
+    M._callback = nil
+    coroutine.resume(co, selection)
+  end
+
   local opts = {
     prompt_title = 'Select Process',
     preview_title = 'Process Information',
@@ -47,10 +54,9 @@ function M.pick()
       telescope.actions.select_default:replace(function()
         telescope.actions.close(prompt_bufnr)
         local selection = telescope.state.get_selected_entry()
-        if not selection then
-          return
+        if selection and M._callback then
+          M._callback(selection)
         end
-        coroutine.resume(coroutine.running(), selection)
       end)
       return true
     end,
@@ -68,7 +74,9 @@ function M.pick()
     return nil
   end
 
+  -- Yield until selection is made via callback
   local value = coroutine.yield()
+  
   if not value or not value.value or not value.value.pid then
     return nil
   end
