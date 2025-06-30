@@ -161,7 +161,6 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
-      'seblj/roslyn.nvim',
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
@@ -170,92 +169,13 @@ return {
     },
     config = function()
       setup_lsp_handlers()
-      require('mason').setup()
+      require('mason').setup({
+        registries = {
+          "github:mason-org/mason-registry",
+          "github:Crashdummyy/mason-registry",
+        }
+      })
       require('mason-lspconfig').setup()
-
-      -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-      --
-      --  Add any additional override configuration in the following tables. They will be passed to
-      --  the `settings` field of the server config. You must look up that documentation yourself.
-      --
-      --  If you want to override the default filetypes that your language server will attach to you can
-      --  define the property 'filetypes' to the map in question.
-      local servers = {
-        clangd = {
-          cmd = {
-            'clangd',
-            '--background-index',
-            '--clang-tidy',
-            '--header-insertion=never',
-            '--completion-style=detailed',
-            '--function-arg-placeholders',
-          },
-        },
-        gopls = {
-          analyses = {
-            unusedparams = true,
-          },
-          staticcheck = true,
-          gofumpt = true,
-          usePlaceholders = true,
-          hints = {
-            assignVariableTypes = true,
-            compositeLiteralFields = true,
-            compositeLiteralTypes = true,
-            constantValues = true,
-            functionTypeParameters = true,
-            parameterNames = true,
-            rangeVariableTypes = true,
-          },
-        },
-        pyright = {
-          analysis = {
-            autoSearchPaths = true,
-            useLibraryCodeForTypes = true,
-            diagnosticMode = 'openFilesOnly',
-          },
-        },
-        rust_analyzer = {
-          cargo = {
-            allFeatures = true,
-            loadOutDirsFromCheck = true,
-            runBuildScripts = true,
-          },
-          checkOnSave = {
-            allFeatures = true,
-            command = 'clippy',
-            extraArgs = { '--no-deps' },
-          },
-          procMacro = {
-            enable = true,
-            ignored = {
-              ['async-trait'] = { 'async_trait' },
-              ['napi-derive'] = { 'napi' },
-              ['async-recursion'] = { 'async_recursion' },
-            },
-          },
-        },
-        html = { filetypes = { 'html', 'twig', 'hbs' } },
-        cssls = { filetypes = { 'css', 'scss', 'less', 'sass' } },
-        lua_ls = {
-          Lua = {
-            workspace = {
-              checkThirdParty = false,
-              library = {
-                '${3rd}/luv/library',
-                unpack(vim.api.nvim_get_runtime_file('', true)),
-              },
-            },
-            completion = {
-              callSnippet = 'Replace',
-            },
-            telemetry = { enable = false },
-            hint = { enable = true },
-          },
-        },
-        prismals = {},
-      }
 
       -- Setup neovim lua configuration
       require('neodev').setup()
@@ -288,57 +208,158 @@ return {
         }
       )
 
-      -- Ensure the servers above are installed
-      local mason_lspconfig = require 'mason-lspconfig'
-      local server_list = vim.tbl_keys(servers)
+      -- Set default configuration for all LSP servers
+      vim.lsp.config('*', {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        root_markers = { '.git' },
+      })
 
-      mason_lspconfig.setup {
-        ensure_installed = server_list,
+      -- Configure individual servers using the new API
+      vim.lsp.config.clangd = {
+        cmd = {
+          'clangd',
+          '--background-index',
+          '--clang-tidy',
+          '--header-insertion=never',
+          '--completion-style=detailed',
+          '--function-arg-placeholders',
+        },
       }
 
-      local lspconfig = require 'lspconfig'
-
-      mason_lspconfig.setup_handlers {
-        function(server_name)
-          lspconfig[server_name].setup {
-            capabilities = capabilities,
-            on_attach = on_attach,
-            settings = servers[server_name],
-            filetypes = (servers[server_name] or {}).filetypes,
-          }
-        end,
-        cssls = function()
-          require('lspconfig').cssls.setup {
-            capabilities = vim.tbl_deep_extend('force', capabilities, {
-              textDocument = {
-                completion = {
-                  completionItem = {
-                    snippetSupport = true,
-                  },
-                },
-              },
-            }),
-            on_attach = on_attach,
-            settings = servers.cssls,
-            filetypes = servers.cssls.filetypes,
-          }
-        end,
-      }
-
-      require('roslyn').setup {
-        config = {
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { 'cs' },
-          settings = {
-            ["csharp|background_analysis"] = {
-              dotnet_analyzer_diagnostics_scope = "openFiles",
-              dotnet_compiler_diagnostics_scope = "fullSolution",
+      vim.lsp.config.gopls = {
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+            },
+            staticcheck = true,
+            gofumpt = true,
+            usePlaceholders = true,
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
             },
           },
         },
       }
+
+      vim.lsp.config.pyright = {
+        settings = {
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = 'openFilesOnly',
+            },
+          },
+        },
+      }
+
+      vim.lsp.config.rust_analyzer = {
+        settings = {
+          ['rust-analyzer'] = {
+            cargo = {
+              allFeatures = true,
+              loadOutDirsFromCheck = true,
+              runBuildScripts = true,
+            },
+            checkOnSave = {
+              allFeatures = true,
+              command = 'clippy',
+              extraArgs = { '--no-deps' },
+            },
+            procMacro = {
+              enable = true,
+              ignored = {
+                ['async-trait'] = { 'async_trait' },
+                ['napi-derive'] = { 'napi' },
+                ['async-recursion'] = { 'async_recursion' },
+              },
+            },
+          },
+        },
+      }
+
+      vim.lsp.config.html = {
+        filetypes = { 'html', 'twig', 'hbs' },
+      }
+
+      vim.lsp.config.cssls = {
+        filetypes = { 'css', 'scss', 'less', 'sass' },
+      }
+
+      vim.lsp.config.lua_ls = {
+        settings = {
+          Lua = {
+            workspace = {
+              checkThirdParty = false,
+              library = {
+                '${3rd}/luv/library',
+                unpack(vim.api.nvim_get_runtime_file('', true)),
+              },
+            },
+            completion = {
+              callSnippet = 'Replace',
+            },
+            telemetry = { enable = false },
+            hint = { enable = true },
+          },
+        },
+      }
+
+      vim.lsp.config.prismals = {}
+
+      -- Enable servers using mason-lspconfig
+      local servers = {
+        'clangd', 'gopls', 'pyright', 'rust_analyzer', 
+        'html', 'cssls', 'lua_ls', 'prismals'
+      }
+
+      local mason_lspconfig = require 'mason-lspconfig'
+      mason_lspconfig.setup {
+        ensure_installed = servers,
+      }
+
+      -- Enable servers directly
+      for _, server_name in ipairs(servers) do
+        vim.lsp.enable(server_name)
+      end
+
+      -- Configure roslyn LSP server (handled by roslyn.nvim plugin)
+      vim.lsp.config("roslyn", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          ["csharp|background_analysis"] = {
+            dotnet_analyzer_diagnostics_scope = "openFiles",
+            dotnet_compiler_diagnostics_scope = "fullSolution",
+          },
+          ["csharp|inlay_hints"] = {
+            csharp_enable_inlay_hints_for_implicit_object_creation = true,
+            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+          },
+          ["csharp|code_lens"] = {
+            dotnet_enable_references_code_lens = true,
+          },
+        },
+      })
+
     end,
+  },
+  {
+    'seblyng/roslyn.nvim',
+    ft = 'cs',
+    opts = {
+      filewatching = 'auto',
+      broad_search = false,
+      lock_target = false,
+    },
   },
   {
     'pmizio/typescript-tools.nvim',
