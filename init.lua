@@ -73,6 +73,7 @@ require('lazy').setup({
   require 'plugins.copilot',
   require 'plugins.supermaven',
   require 'plugins.dap',
+  require 'plugins.claude-code',
 }, {})
 
 require 'remap'
