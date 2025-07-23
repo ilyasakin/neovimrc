@@ -33,6 +33,9 @@ vim.opt.synmaxcol = 240
 vim.g.did_install_default_menus = 1
 vim.g.did_install_syntax_menu = 1
 
+-- Auto-reload buffers when files change
+vim.opt.autoread = true
+
 vim.loader.enable()
 
 -- Disable unused providers

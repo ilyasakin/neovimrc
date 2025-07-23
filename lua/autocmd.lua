@@ -17,17 +17,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
-vim.api.nvim_create_autocmd({ 'InsertLeave' }, {
+
+-- Auto-reload buffers when files change externally
+local autoread_group = vim.api.nvim_create_augroup('AutoRead', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
+  group = autoread_group,
   pattern = '*',
   callback = function()
-    local clients = vim.lsp.get_clients { name = 'roslyn' }
-    if not clients or #clients == 0 then
-      return
-    end
-
-    local buffers = vim.lsp.get_buffers_by_client_id(clients[1].id)
-    for _, buf in ipairs(buffers) do
-      vim.lsp.util._refresh('textDocument/diagnostic', { bufnr = buf })
+    if vim.fn.mode() ~= 'c' then
+      vim.cmd('checktime')
     end
   end,
+  desc = 'Check for file changes when focus is gained or cursor is held',
 })

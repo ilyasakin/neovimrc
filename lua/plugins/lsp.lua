@@ -2,9 +2,17 @@ local setup_lsp_handlers = function()
   -- Configure LSP logging
   vim.lsp.set_log_level("ERROR")
   local log_path = vim.fn.stdpath("log") .. "/lsp.log"
-  vim.lsp.set_log_level("ERROR")
   if vim.fn.filereadable(log_path) == 1 then
     os.remove(log_path)
+  end
+
+  -- Override diagnostic handler to prevent bufstate nil errors
+  local original_handler = vim.lsp.handlers['textDocument/publishDiagnostics']
+  vim.lsp.handlers['textDocument/publishDiagnostics'] = function(err, result, ctx, config)
+    if not result then return end
+    local bufnr = vim.uri_to_bufnr(result.uri)
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    return original_handler(err, result, ctx, config)
   end
 
   -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
@@ -22,7 +30,7 @@ local setup_lsp_handlers = function()
       result = vim.iter.map(function(hint)
         local label = hint.label ---@type string
         if label:len() >= 30 then
-          label = label:sub(1, 29) .. ellipsis
+          label = label:sub(1, 29) .. '…'
         end
         hint.label = label
         return hint
@@ -32,40 +40,33 @@ local setup_lsp_handlers = function()
     inlay_hint_handler(err, result, ctx, config)
   end
 
-  -- Optimize diagnostic updates
-  vim.lsp.handlers['textDocument/publishDiagnostics'] =
-      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-        underline = {
-          severity = { min = vim.diagnostic.severity.ERROR },
-        },
-        signs = {
-          severity = { min = vim.diagnostic.severity.ERROR },
-          text = {
-            [vim.diagnostic.severity.ERROR] = '!',
-            [vim.diagnostic.severity.WARN] = '!',
-            [vim.diagnostic.severity.INFO] = 'i',
-            [vim.diagnostic.severity.HINT] = '?',
-          },
-          texthl = {
-            [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
-            [vim.diagnostic.severity.WARN] = 'DiagnosticSignWarn',
-            [vim.diagnostic.severity.INFO] = 'DiagnosticSignInfo',
-            [vim.diagnostic.severity.HINT] = 'DiagnosticSignHint',
-          },
-        },
-        virtual_text = {
-          spacing = 5,
-          severity = { min = vim.diagnostic.severity.ERROR },
-        },
-        update_in_insert = false,
-        severity_sort = true,
-        float = {
-          header = '',
-          source = 'if_many',
-          border = 'rounded',
-          max_width = 100,
-        },
-      })
+  -- Configure diagnostics
+  vim.diagnostic.config({
+    underline = {
+      severity = { min = vim.diagnostic.severity.ERROR },
+    },
+    signs = {
+      severity = { min = vim.diagnostic.severity.ERROR },
+      text = {
+        [vim.diagnostic.severity.ERROR] = '!',
+        [vim.diagnostic.severity.WARN] = '!',
+        [vim.diagnostic.severity.INFO] = 'i',
+        [vim.diagnostic.severity.HINT] = '?',
+      },
+    },
+    virtual_text = {
+      spacing = 5,
+      severity = { min = vim.diagnostic.severity.ERROR },
+    },
+    update_in_insert = false,
+    severity_sort = true,
+    float = {
+      header = '',
+      source = 'if_many',
+      border = 'rounded',
+      max_width = 100,
+    },
+  })
 
   -- Debounce progress updates
   local progress = {}
@@ -81,24 +82,22 @@ local setup_lsp_handlers = function()
       return
     end
 
-    if progress[client_id] then
-      if val.kind == 'begin' then
-        progress[client_id] = {
-          title = val.title,
-          message = val.message,
-          percentage = val.percentage,
-          spinner = 1,
-        }
-      elseif val.kind == 'report' then
-        progress[client_id] = {
-          title = progress[client_id].title,
-          message = val.message,
-          percentage = val.percentage,
-          spinner = progress[client_id].spinner + 1,
-        }
-      elseif val.kind == 'end' then
-        progress[client_id] = nil
-      end
+    if val.kind == 'begin' then
+      progress[client_id] = {
+        title = val.title,
+        message = val.message,
+        percentage = val.percentage,
+        spinner = 1,
+      }
+    elseif progress[client_id] and val.kind == 'report' then
+      progress[client_id] = {
+        title = progress[client_id].title,
+        message = val.message,
+        percentage = val.percentage,
+        spinner = progress[client_id].spinner + 1,
+      }
+    elseif progress[client_id] and val.kind == 'end' then
+      progress[client_id] = nil
     end
   end
 
@@ -208,15 +207,14 @@ return {
         }
       )
 
-      -- Set default configuration for all LSP servers
-      vim.lsp.config('*', {
+      -- Configure servers individually with proper initialization
+      local servers_config = {
         capabilities = capabilities,
         on_attach = on_attach,
-        root_markers = { '.git' },
-      })
+      }
 
       -- Configure individual servers using the new API
-      vim.lsp.config.clangd = {
+      vim.lsp.config.clangd = vim.tbl_extend('force', servers_config, {
         cmd = {
           'clangd',
           '--background-index',
@@ -225,9 +223,9 @@ return {
           '--completion-style=detailed',
           '--function-arg-placeholders',
         },
-      }
+      })
 
-      vim.lsp.config.gopls = {
+      vim.lsp.config.gopls = vim.tbl_extend('force', servers_config, {
         settings = {
           gopls = {
             analyses = {
@@ -247,9 +245,9 @@ return {
             },
           },
         },
-      }
+      })
 
-      vim.lsp.config.pyright = {
+      vim.lsp.config.pyright = vim.tbl_extend('force', servers_config, {
         settings = {
           python = {
             analysis = {
@@ -259,9 +257,9 @@ return {
             },
           },
         },
-      }
+      })
 
-      vim.lsp.config.rust_analyzer = {
+      vim.lsp.config.rust_analyzer = vim.tbl_extend('force', servers_config, {
         settings = {
           ['rust-analyzer'] = {
             cargo = {
@@ -284,17 +282,17 @@ return {
             },
           },
         },
-      }
+      })
 
-      vim.lsp.config.html = {
+      vim.lsp.config.html = vim.tbl_extend('force', servers_config, {
         filetypes = { 'html', 'twig', 'hbs' },
-      }
+      })
 
-      vim.lsp.config.cssls = {
+      vim.lsp.config.cssls = vim.tbl_extend('force', servers_config, {
         filetypes = { 'css', 'scss', 'less', 'sass' },
-      }
+      })
 
-      vim.lsp.config.lua_ls = {
+      vim.lsp.config.lua_ls = vim.tbl_extend('force', servers_config, {
         settings = {
           Lua = {
             workspace = {
@@ -311,9 +309,9 @@ return {
             hint = { enable = true },
           },
         },
-      }
+      })
 
-      vim.lsp.config.prismals = {}
+      vim.lsp.config.prismals = servers_config
 
       -- Enable servers using mason-lspconfig
       local servers = {
@@ -326,13 +324,30 @@ return {
         ensure_installed = servers,
       }
 
+      -- Set up autocmd for LSP attach to ensure keymaps are registered
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+        callback = function(event)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client then
+            on_attach(client, event.buf)
+          end
+        end,
+      })
+
       -- Enable servers directly
       for _, server_name in ipairs(servers) do
         vim.lsp.enable(server_name)
       end
 
-      -- Configure roslyn LSP server (handled by roslyn.nvim plugin)
-      vim.lsp.config("roslyn", {
+
+    end,
+  },
+  {
+    'seblyng/roslyn.nvim',
+    ft = 'cs',
+    opts = {
+      config = {
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {
@@ -348,14 +363,7 @@ return {
             dotnet_enable_references_code_lens = true,
           },
         },
-      })
-
-    end,
-  },
-  {
-    'seblyng/roslyn.nvim',
-    ft = 'cs',
-    opts = {
+      },
       filewatching = 'auto',
       broad_search = false,
       lock_target = false,
