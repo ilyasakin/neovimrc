@@ -15,30 +15,7 @@ local setup_lsp_handlers = function()
     return original_handler(err, result, ctx, config)
   end
 
-  -- https://www.reddit.com/r/neovim/comments/1c3iz5j/hack_truncate_long_typescript_inlay_hints
-  -- Workaround for truncating long TypeScript inlay hints.
-  -- TODO: Remove this if https://github.com/neovim/neovim/issues/27240 gets addressed.
-  local inlay_hint_handler = vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint]
-  vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_inlayHint] = function(
-      err,
-      result,
-      ctx,
-      config
-  )
-    local client = vim.lsp.get_client_by_id(ctx.client_id)
-    if client and client.name == 'typescript-tools' then
-      result = vim.iter.map(function(hint)
-        local label = hint.label ---@type string
-        if label:len() >= 30 then
-          label = label:sub(1, 29) .. '…'
-        end
-        hint.label = label
-        return hint
-      end, result)
-    end
-
-    inlay_hint_handler(err, result, ctx, config)
-  end
+  -- Inlay hints are disabled
 
   -- Configure diagnostics
   vim.diagnostic.config({
@@ -109,18 +86,7 @@ local on_attach = function(client, bufnr)
 
   local utils = require 'utils'
 
-  if client.server_capabilities.inlayHintProvider then
-    local enable_inlay_hints = {
-      typescript = true,
-      javascript = true,
-      typescriptreact = true,
-      javascriptreact = true,
-      rust = true,
-    }
-    if enable_inlay_hints[vim.bo[bufnr].filetype] then
-      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-    end
-  end
+  -- Inlay hints are disabled globally
 
   utils.lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   utils.lsp_nmap('<leader>ca', require('tiny-code-action').code_action, '[C]ode [A]ction')
@@ -213,8 +179,11 @@ return {
         on_attach = on_attach,
       }
 
-      -- Configure individual servers using the new API
-      vim.lsp.config.clangd = vim.tbl_extend('force', servers_config, {
+      -- Get lspconfig for proper server setup
+      local lspconfig = require('lspconfig')
+      
+      -- Configure individual servers using lspconfig
+      lspconfig.clangd.setup(vim.tbl_extend('force', servers_config, {
         cmd = {
           'clangd',
           '--background-index',
@@ -223,9 +192,9 @@ return {
           '--completion-style=detailed',
           '--function-arg-placeholders',
         },
-      })
+      }))
 
-      vim.lsp.config.gopls = vim.tbl_extend('force', servers_config, {
+      lspconfig.gopls.setup(vim.tbl_extend('force', servers_config, {
         settings = {
           gopls = {
             analyses = {
@@ -245,9 +214,52 @@ return {
             },
           },
         },
-      })
+      }))
 
-      vim.lsp.config.pyright = vim.tbl_extend('force', servers_config, {
+      -- Function to find Python path searching parent directories 
+      local function find_python_path()
+        local current_dir = vim.fn.expand('%:p:h')
+        local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
+        
+        -- If not in git repo, fallback to system python
+        if git_root == '' then
+          return vim.fn.exepath('python3') or vim.fn.exepath('python')
+        end
+        
+        -- Common venv directory names
+        local venv_names = { 'venv', '.venv', 'env', '.env' }
+        
+        -- Search from current directory up to git root
+        local search_dir = current_dir
+        while search_dir and search_dir ~= '' and vim.fn.fnamemodify(search_dir, ':p') ~= vim.fn.fnamemodify(git_root, ':p') do
+          for _, venv_name in ipairs(venv_names) do
+            local venv_path = search_dir .. '/' .. venv_name
+            local python_path = venv_path .. '/bin/python'
+            if vim.fn.executable(python_path) == 1 then
+              return python_path
+            end
+          end
+          search_dir = vim.fn.fnamemodify(search_dir, ':h')
+        end
+        
+        -- Check git root as well
+        for _, venv_name in ipairs(venv_names) do
+          local venv_path = git_root .. '/' .. venv_name
+          local python_path = venv_path .. '/bin/python'
+          if vim.fn.executable(python_path) == 1 then
+            return python_path
+          end
+        end
+        
+        -- Fallback to system python
+        return vim.fn.exepath('python3') or vim.fn.exepath('python')
+      end
+
+      lspconfig.pyright.setup(vim.tbl_extend('force', servers_config, {
+        before_init = function(params, config)
+          local python_path = find_python_path()
+          config.settings.python.pythonPath = python_path
+        end,
         settings = {
           python = {
             analysis = {
@@ -257,9 +269,9 @@ return {
             },
           },
         },
-      })
+      }))
 
-      vim.lsp.config.rust_analyzer = vim.tbl_extend('force', servers_config, {
+      lspconfig.rust_analyzer.setup(vim.tbl_extend('force', servers_config, {
         settings = {
           ['rust-analyzer'] = {
             cargo = {
@@ -282,17 +294,17 @@ return {
             },
           },
         },
-      })
+      }))
 
-      vim.lsp.config.html = vim.tbl_extend('force', servers_config, {
+      lspconfig.html.setup(vim.tbl_extend('force', servers_config, {
         filetypes = { 'html', 'twig', 'hbs' },
-      })
+      }))
 
-      vim.lsp.config.cssls = vim.tbl_extend('force', servers_config, {
+      lspconfig.cssls.setup(vim.tbl_extend('force', servers_config, {
         filetypes = { 'css', 'scss', 'less', 'sass' },
-      })
+      }))
 
-      vim.lsp.config.lua_ls = vim.tbl_extend('force', servers_config, {
+      lspconfig.lua_ls.setup(vim.tbl_extend('force', servers_config, {
         settings = {
           Lua = {
             workspace = {
@@ -309,9 +321,9 @@ return {
             hint = { enable = true },
           },
         },
-      })
+      }))
 
-      vim.lsp.config.prismals = servers_config
+      lspconfig.prismals.setup(servers_config)
 
       -- Enable servers using mason-lspconfig
       local servers = {
@@ -334,11 +346,6 @@ return {
           end
         end,
       })
-
-      -- Enable servers directly
-      for _, server_name in ipairs(servers) do
-        vim.lsp.enable(server_name)
-      end
 
 
     end,
@@ -372,6 +379,32 @@ return {
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+    config = function()
+      require('typescript-tools').setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          separate_diagnostic_server = true,
+          publish_diagnostic_on = 'insert_leave',
+          expose_as_code_action = {},
+          tsserver_path = nil,
+          tsserver_plugins = {},
+          tsserver_max_memory = 'auto',
+          tsserver_format_options = {},
+          tsserver_file_preferences = {
+            includeInlayParameterNameHints = 'none',
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayFunctionParameterTypeHints = false,
+            includeInlayVariableTypeHints = false,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = false,
+            includeInlayFunctionLikeReturnTypeHints = false,
+            includeInlayEnumMemberValueHints = false,
+          },
+        },
+      })
+    end,
   },
   {
     'rachartier/tiny-code-action.nvim',

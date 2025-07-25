@@ -20,7 +20,6 @@ vim.g.do_filetype_lua = 1
 vim.opt.swapfile = false
 vim.opt.splitright = true
 vim.opt.splitbelow = true
-vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.wrap = false
 vim.opt.guicursor = ''
@@ -47,7 +46,7 @@ vim.g.python3_host_prog = vim.fn.expand('~/.config/nvim/venv/bin/python3')
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     'git',
     'clone',

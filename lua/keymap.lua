@@ -1,8 +1,8 @@
-vim.api.nvim_set_keymap('n', '<leader>gs', ':G status<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>gc', ':G commit<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>gp', ':G push<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>gl', ':G log<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>gd', ':Gvdiffsplit<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>gs', ':G status<CR>', { desc = 'Git status' })
+vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git commit' })
+vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git push' })
+vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git log' })
+vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit<CR>', { desc = 'Git diff split' })
 
 -- [[ Basic Keymaps ]]
 

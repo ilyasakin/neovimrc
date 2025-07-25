@@ -1,15 +1,17 @@
 return {
-  { 'tpope/vim-sleuth' },
+  { 'tpope/vim-sleuth', event = 'BufReadPre' },
 
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
+    event = 'BufReadPost',
     opts = {},
   },
 
   {
     'm4xshen/hardtime.nvim',
     dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
+    cmd = { 'Hardtime' },
     opts = {
       enabled = false,
     },
@@ -32,5 +34,5 @@ return {
     opts = {},
   },
 
-  { 'danilamihailov/beacon.nvim' },
+  { 'danilamihailov/beacon.nvim', event = 'CursorMoved' },
 }

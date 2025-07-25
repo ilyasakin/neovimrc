@@ -1,6 +1,5 @@
 return {
   -- Autocompletion
-  -- 'hrsh7th/nvim-cmp',
   "iguanacucumber/magazine.nvim",
   name = "nvim-cmp", -- Otherwise highlighting gets messed up
   dependencies = {
@@ -25,7 +24,6 @@ return {
     'hrsh7th/cmp-path',
 
     -- Adds a number of user-friendly snippets
-    -- 'rafamadriz/friendly-snippets',
   },
   config = function()
     local cmp = require 'cmp'
@@ -92,7 +90,6 @@ return {
           end,
         },
         { name = "vim-dadbod-completion" },
-        -- { name = 'luasnip' },
         { name = 'path' },
       },
       sorting = {
