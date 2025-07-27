@@ -76,6 +76,7 @@ require('lazy').setup({
   require 'plugins.supermaven',
   require 'plugins.dap',
   require 'plugins.claude-code',
+  require 'plugins.venv-selector',
 }, {})
 
 require 'remap'

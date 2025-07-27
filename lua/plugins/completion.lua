@@ -29,6 +29,7 @@ return {
     local cmp = require 'cmp'
     local luasnip = require 'luasnip'
     require('luasnip.loaders.from_vscode').lazy_load()
+    require('luasnip.loaders.from_snipmate').lazy_load()
     luasnip.config.setup {}
     --
     local lspkind = require 'lspkind'
@@ -89,6 +90,7 @@ return {
             return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
           end,
         },
+        { name = 'luasnip' },
         { name = "vim-dadbod-completion" },
         { name = 'path' },
       },

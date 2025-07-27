@@ -20,10 +20,10 @@ local setup_lsp_handlers = function()
   -- Configure diagnostics
   vim.diagnostic.config({
     underline = {
-      severity = { min = vim.diagnostic.severity.ERROR },
+      severity = { min = vim.diagnostic.severity.WARN },
     },
     signs = {
-      severity = { min = vim.diagnostic.severity.ERROR },
+      severity = { min = vim.diagnostic.severity.WARN },
       text = {
         [vim.diagnostic.severity.ERROR] = '!',
         [vim.diagnostic.severity.WARN] = '!',
@@ -33,7 +33,7 @@ local setup_lsp_handlers = function()
     },
     virtual_text = {
       spacing = 5,
-      severity = { min = vim.diagnostic.severity.ERROR },
+      severity = { min = vim.diagnostic.severity.WARN },
     },
     update_in_insert = false,
     severity_sort = true,
@@ -130,7 +130,8 @@ return {
       { 'j-hui/fidget.nvim',       opts = {} },
       'folke/neodev.nvim',
       "iguanacucumber/magazine.nvim",
-      'rachartier/tiny-code-action.nvim'
+      'rachartier/tiny-code-action.nvim',
+      'b0o/schemastore.nvim'
     },
     config = function()
       setup_lsp_handlers()
@@ -181,7 +182,7 @@ return {
 
       -- Get lspconfig for proper server setup
       local lspconfig = require('lspconfig')
-      
+
       -- Configure individual servers using lspconfig
       lspconfig.clangd.setup(vim.tbl_extend('force', servers_config, {
         cmd = {
@@ -216,60 +217,7 @@ return {
         },
       }))
 
-      -- Function to find Python path searching parent directories 
-      local function find_python_path()
-        local current_dir = vim.fn.expand('%:p:h')
-        local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
-        
-        -- If not in git repo, fallback to system python
-        if git_root == '' then
-          return vim.fn.exepath('python3') or vim.fn.exepath('python')
-        end
-        
-        -- Common venv directory names
-        local venv_names = { 'venv', '.venv', 'env', '.env' }
-        
-        -- Search from current directory up to git root
-        local search_dir = current_dir
-        while search_dir and search_dir ~= '' and vim.fn.fnamemodify(search_dir, ':p') ~= vim.fn.fnamemodify(git_root, ':p') do
-          for _, venv_name in ipairs(venv_names) do
-            local venv_path = search_dir .. '/' .. venv_name
-            local python_path = venv_path .. '/bin/python'
-            if vim.fn.executable(python_path) == 1 then
-              return python_path
-            end
-          end
-          search_dir = vim.fn.fnamemodify(search_dir, ':h')
-        end
-        
-        -- Check git root as well
-        for _, venv_name in ipairs(venv_names) do
-          local venv_path = git_root .. '/' .. venv_name
-          local python_path = venv_path .. '/bin/python'
-          if vim.fn.executable(python_path) == 1 then
-            return python_path
-          end
-        end
-        
-        -- Fallback to system python
-        return vim.fn.exepath('python3') or vim.fn.exepath('python')
-      end
-
-      lspconfig.pyright.setup(vim.tbl_extend('force', servers_config, {
-        before_init = function(params, config)
-          local python_path = find_python_path()
-          config.settings.python.pythonPath = python_path
-        end,
-        settings = {
-          python = {
-            analysis = {
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-              diagnosticMode = 'openFilesOnly',
-            },
-          },
-        },
-      }))
+      lspconfig.pyright.setup(servers_config)
 
       lspconfig.rust_analyzer.setup(vim.tbl_extend('force', servers_config, {
         settings = {
@@ -325,10 +273,61 @@ return {
 
       lspconfig.prismals.setup(servers_config)
 
+      -- Configure additional common LSP servers
+      lspconfig.jsonls.setup(vim.tbl_extend('force', servers_config, {
+        settings = {
+          json = {
+            schemas = require('schemastore').json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      }))
+
+      lspconfig.yamlls.setup(vim.tbl_extend('force', servers_config, {
+        settings = {
+          yaml = {
+            schemaStore = {
+              enable = false,
+              url = '',
+            },
+            schemas = require('schemastore').yaml.schemas(),
+          },
+        },
+      }))
+
+      lspconfig.bashls.setup(servers_config)
+      lspconfig.dockerls.setup(servers_config)
+
+      -- Swift LSP configuration (SourceKit-LSP)
+      lspconfig.sourcekit.setup(vim.tbl_extend('force', servers_config, {
+        cmd = { 'sourcekit-lsp' },
+        filetypes = { 'swift', 'c', 'cpp', 'objective-c', 'objective-cpp' },
+        root_dir = function(filename, _)
+          local util = require('lspconfig.util')
+          return util.root_pattern('buildServer.json', '*.xcodeproj', '*.xcworkspace', 'Package.swift',
+                'compile_commands.json', '.git')(filename)
+              or util.find_git_ancestor(filename)
+              or util.path.dirname(filename)
+        end,
+        capabilities = vim.tbl_deep_extend('force', capabilities, {
+          workspace = {
+            didChangeWatchedFiles = {
+              dynamicRegistration = true,
+            },
+          },
+        }),
+        settings = {},
+      }))
+
+      -- Kotlin LSP configuration
+      lspconfig.kotlin_language_server.setup(servers_config)
+
       -- Enable servers using mason-lspconfig
       local servers = {
-        'clangd', 'gopls', 'pyright', 'rust_analyzer', 
-        'html', 'cssls', 'lua_ls', 'prismals'
+        'clangd', 'gopls', 'pyright', 'rust_analyzer',
+        'html', 'cssls', 'lua_ls', 'prismals',
+        'jsonls', 'yamlls', 'bashls', 'dockerls',
+        'kotlin_language_server'
       }
 
       local mason_lspconfig = require 'mason-lspconfig'
@@ -346,8 +345,6 @@ return {
           end
         end,
       })
-
-
     end,
   },
   {
