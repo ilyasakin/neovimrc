@@ -1,6 +1,6 @@
 local setup_lsp_handlers = function()
   -- Configure LSP logging
-  vim.lsp.set_log_level("ERROR")
+  vim.lsp.log.set_level("ERROR")
   local log_path = vim.fn.stdpath("log") .. "/lsp.log"
   if vim.fn.filereadable(log_path) == 1 then
     os.remove(log_path)
@@ -180,11 +180,10 @@ return {
         on_attach = on_attach,
       }
 
-      -- Get lspconfig for proper server setup
-      local lspconfig = require('lspconfig')
+      -- Use vim.lsp.config for server setup (new API in Neovim 0.11+)
 
-      -- Configure individual servers using lspconfig
-      lspconfig.clangd.setup(vim.tbl_extend('force', servers_config, {
+      -- Configure individual servers using vim.lsp.config
+      vim.lsp.config.clangd = vim.tbl_extend('force', servers_config, {
         cmd = {
           'clangd',
           '--background-index',
@@ -193,9 +192,10 @@ return {
           '--completion-style=detailed',
           '--function-arg-placeholders',
         },
-      }))
+      })
+      vim.lsp.enable('clangd')
 
-      lspconfig.gopls.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.gopls = vim.tbl_extend('force', servers_config, {
         settings = {
           gopls = {
             analyses = {
@@ -215,11 +215,13 @@ return {
             },
           },
         },
-      }))
+      })
+      vim.lsp.enable('gopls')
 
-      lspconfig.pyright.setup(servers_config)
+      vim.lsp.config.pyright = servers_config
+      vim.lsp.enable('pyright')
 
-      lspconfig.rust_analyzer.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.rust_analyzer = vim.tbl_extend('force', servers_config, {
         settings = {
           ['rust-analyzer'] = {
             cargo = {
@@ -242,17 +244,20 @@ return {
             },
           },
         },
-      }))
+      })
+      vim.lsp.enable('rust_analyzer')
 
-      lspconfig.html.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.html = vim.tbl_extend('force', servers_config, {
         filetypes = { 'html', 'twig', 'hbs' },
-      }))
+      })
+      vim.lsp.enable('html')
 
-      lspconfig.cssls.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.cssls = vim.tbl_extend('force', servers_config, {
         filetypes = { 'css', 'scss', 'less', 'sass' },
-      }))
+      })
+      vim.lsp.enable('cssls')
 
-      lspconfig.lua_ls.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.lua_ls = vim.tbl_extend('force', servers_config, {
         settings = {
           Lua = {
             workspace = {
@@ -269,21 +274,24 @@ return {
             hint = { enable = true },
           },
         },
-      }))
+      })
+      vim.lsp.enable('lua_ls')
 
-      lspconfig.prismals.setup(servers_config)
+      vim.lsp.config.prismals = servers_config
+      vim.lsp.enable('prismals')
 
       -- Configure additional common LSP servers
-      lspconfig.jsonls.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.jsonls = vim.tbl_extend('force', servers_config, {
         settings = {
           json = {
             schemas = require('schemastore').json.schemas(),
             validate = { enable = true },
           },
         },
-      }))
+      })
+      vim.lsp.enable('jsonls')
 
-      lspconfig.yamlls.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.yamlls = vim.tbl_extend('force', servers_config, {
         settings = {
           yaml = {
             schemaStore = {
@@ -293,21 +301,39 @@ return {
             schemas = require('schemastore').yaml.schemas(),
           },
         },
-      }))
+      })
+      vim.lsp.enable('yamlls')
 
-      lspconfig.bashls.setup(servers_config)
-      lspconfig.dockerls.setup(servers_config)
+      vim.lsp.config.bashls = servers_config
+      vim.lsp.enable('bashls')
+      vim.lsp.config.dockerls = servers_config
+      vim.lsp.enable('dockerls')
 
       -- Swift LSP configuration (SourceKit-LSP)
-      lspconfig.sourcekit.setup(vim.tbl_extend('force', servers_config, {
+      vim.lsp.config.sourcekit = vim.tbl_extend('force', servers_config, {
         cmd = { 'sourcekit-lsp' },
         filetypes = { 'swift', 'c', 'cpp', 'objective-c', 'objective-cpp' },
         root_dir = function(filename, _)
-          local util = require('lspconfig.util')
-          return util.root_pattern('buildServer.json', '*.xcodeproj', '*.xcworkspace', 'Package.swift',
-                'compile_commands.json', '.git')(filename)
-              or util.find_git_ancestor(filename)
-              or util.path.dirname(filename)
+          -- Use vim.fs.find for root pattern detection
+          local markers = {'buildServer.json', '*.xcodeproj', '*.xcworkspace', 'Package.swift', 'compile_commands.json', '.git'}
+          local found = vim.fs.find(markers, {
+            path = filename,
+            upward = true,
+            stop = vim.fn.expand('~')
+          })[1]
+          if found then
+            return vim.fs.dirname(found)
+          end
+          -- Fallback to git ancestor or current dir
+          local git_dir = vim.fs.find('.git', {
+            path = filename,
+            upward = true,
+            stop = vim.fn.expand('~')
+          })[1]
+          if git_dir then
+            return vim.fs.dirname(git_dir)
+          end
+          return vim.fs.dirname(filename)
         end,
         capabilities = vim.tbl_deep_extend('force', capabilities, {
           workspace = {
@@ -317,10 +343,12 @@ return {
           },
         }),
         settings = {},
-      }))
+      })
+      vim.lsp.enable('sourcekit')
 
       -- Kotlin LSP configuration
-      lspconfig.kotlin_language_server.setup(servers_config)
+      vim.lsp.config.kotlin_language_server = servers_config
+      vim.lsp.enable('kotlin_language_server')
 
       -- Enable servers using mason-lspconfig
       local servers = {

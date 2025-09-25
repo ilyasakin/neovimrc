@@ -14,7 +14,8 @@ return {
     opts = {},
   },
   {
-    "zbirenbaum/neodim",
+    "ALVAROPING1/neodim",
+    branch = "fix-nvim-0.11",
     event = "LspAttach",
     config = function()
       require("neodim").setup()
