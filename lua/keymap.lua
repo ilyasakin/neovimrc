@@ -1,4 +1,4 @@
-vim.keymap.set('n', '<leader>gs', ':G status<CR>', { desc = 'Git status' })
+vim.keymap.set('n', '<leader>gs', ':Telescope git_status<CR>', { desc = 'Git status' })
 vim.keymap.set('n', '<leader>gc', ':G commit<CR>', { desc = 'Git commit' })
 vim.keymap.set('n', '<leader>gp', ':G push<CR>', { desc = 'Git push' })
 vim.keymap.set('n', '<leader>gl', ':G log<CR>', { desc = 'Git log' })
