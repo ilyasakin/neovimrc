@@ -55,7 +55,7 @@ local setup_lsp_handlers = function()
     end
 
     local val = result.value
-    if not val.kind then
+    if not val or not val.kind then
       return
     end
 
