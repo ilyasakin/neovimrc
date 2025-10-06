@@ -72,7 +72,6 @@ require('lazy').setup({
   require 'plugins.diagnostics',
   require 'plugins.editor',
   require 'plugins.format',
-  require 'plugins.copilot',
   require 'plugins.supermaven',
   require 'plugins.dap',
   -- require 'plugins.claude-code',
