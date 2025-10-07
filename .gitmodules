@@ -1,0 +1,3 @@
+[submodule "lua/private"]
+	path = lua/private
+	url = git@github.com:ilyasakin/nvim-private-modules.git

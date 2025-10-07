@@ -64,3 +64,8 @@ end
 
 vim.keymap.set('n', '<leader>qc', quickCommit, { desc = 'Quick [C]ommit' })
 vim.keymap.set('n', '<leader>qb', quickCommitWithBranch, { desc = 'Quick [C]ommit with [B]ranch' })
+
+local ok, private_launch_settings = pcall(require, 'private.launch_settings')
+if ok and type(private_launch_settings.setup) == 'function' then
+  private_launch_settings.setup()
+end
