@@ -74,9 +74,10 @@ require('lazy').setup({
   require 'plugins.format',
   require 'plugins.supermaven',
   require 'plugins.dap',
-  -- require 'plugins.claude-code',
-  require 'plugins.codex',
+  require 'plugins.claude-code',
+  -- require 'plugins.codex',
   require 'plugins.venv-selector',
+  require 'plugins.zen-mode',
 }, {})
 
 require 'remap'
