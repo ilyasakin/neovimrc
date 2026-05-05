@@ -13,18 +13,22 @@ return {
     },
     opts = {},
   },
-  {
+ 
+ {
+    enabled = false,
     "ALVAROPING1/neodim",
     branch = "fix-nvim-0.11",
     event = "LspAttach",
     config = function()
       require("neodim").setup()
     end,
-  }, {
-  'dgagn/diagflow.nvim',
-  event = 'LspAttach',
-  opts = {},
-},
+  },
+
+  {
+	  'dgagn/diagflow.nvim',
+	  event = 'LspAttach',
+	  opts = {},
+  },
 
   {
     'dmmulroy/tsc.nvim',

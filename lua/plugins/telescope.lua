@@ -18,6 +18,19 @@ return {
   },
 
   config = function()
+    -- nvim-treesitter `main` branch removed `parsers.ft_to_lang` and the
+    -- `nvim-treesitter.configs` module that telescope's previewer relies on.
+    -- Replace telescope's TS highlighter with one that calls `vim.treesitter.start`.
+    local putils = require 'telescope.previewers.utils'
+    putils.ts_highlighter = function(bufnr, ft)
+      local lang = vim.treesitter.language.get_lang(ft) or ft
+      if not lang or lang == '' then
+        return false
+      end
+      local ok = pcall(vim.treesitter.start, bufnr, lang)
+      return ok
+    end
+
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     require('telescope').setup {
