@@ -1,24 +1,14 @@
-local setup_lsp_handlers = function()
+local setup_diagnostics = function()
   -- Configure LSP logging
-  vim.lsp.log.set_level("ERROR")
-  local log_path = vim.fn.stdpath("log") .. "/lsp.log"
+  vim.lsp.log.set_level 'ERROR'
+  local log_path = vim.fn.stdpath 'log' .. '/lsp.log'
   if vim.fn.filereadable(log_path) == 1 then
     os.remove(log_path)
   end
 
-  -- Override diagnostic handler to prevent bufstate nil errors
-  local original_handler = vim.lsp.handlers['textDocument/publishDiagnostics']
-  vim.lsp.handlers['textDocument/publishDiagnostics'] = function(err, result, ctx, config)
-    if not result then return end
-    local bufnr = vim.uri_to_bufnr(result.uri)
-    if not vim.api.nvim_buf_is_valid(bufnr) then return end
-    return original_handler(err, result, ctx, config)
-  end
-
   -- Inlay hints are disabled
 
-  -- Configure diagnostics
-  vim.diagnostic.config({
+  vim.diagnostic.config {
     underline = {
       severity = { min = vim.diagnostic.severity.WARN },
     },
@@ -43,159 +33,150 @@ local setup_lsp_handlers = function()
       border = 'rounded',
       max_width = 100,
     },
-  })
-
-  -- Debounce progress updates
-  local progress = {}
-  local function progress_handler(_, result, ctx)
-    local client_id = ctx.client_id
-    local client = vim.lsp.get_client_by_id(client_id)
-    if not client then
-      return
-    end
-
-    local val = result.value
-    if not val or not val.kind then
-      return
-    end
-
-    if val.kind == 'begin' then
-      progress[client_id] = {
-        title = val.title,
-        message = val.message,
-        percentage = val.percentage,
-        spinner = 1,
-      }
-    elseif progress[client_id] and val.kind == 'report' then
-      progress[client_id] = {
-        title = progress[client_id].title,
-        message = val.message,
-        percentage = val.percentage,
-        spinner = progress[client_id].spinner + 1,
-      }
-    elseif progress[client_id] and val.kind == 'end' then
-      progress[client_id] = nil
-    end
-  end
-
-  vim.lsp.handlers['$/progress'] = progress_handler
+  }
 end
 
+-- Buffer-local LSP keymaps; runs on every LspAttach (including roslyn and typescript-tools)
 local on_attach = function(client, bufnr)
   client.server_capabilities.semanticTokensProvider = nil
 
-  local utils = require 'utils'
+  local map = function(keys, func, desc)
+    vim.keymap.set('n', keys, func, { buffer = bufnr, silent = true, desc = 'LSP: ' .. desc })
+  end
+  -- Telescope is required on use so attaching a server doesn't load it
+  local telescope = function(picker)
+    return function()
+      require('telescope.builtin')[picker]()
+    end
+  end
 
-  -- Inlay hints are disabled globally
+  map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  map('<leader>ca', function()
+    require('tiny-code-action').code_action()
+  end, '[C]ode [A]ction')
 
-  utils.lsp_nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  utils.lsp_nmap('<leader>ca', require('tiny-code-action').code_action, '[C]ode [A]ction')
+  map('gd', telescope 'lsp_definitions', '[G]oto [D]efinition')
+  map('gr', telescope 'lsp_references', '[G]oto [R]eferences')
+  map('gI', telescope 'lsp_implementations', '[G]oto [I]mplementation')
+  map('<leader>D', telescope 'lsp_type_definitions', 'Type [D]efinition')
+  map('<leader>ds', telescope 'lsp_document_symbols', '[D]ocument [S]ymbols')
+  map('<leader>ws', telescope 'lsp_dynamic_workspace_symbols', '[W]orkspace [S]ymbols')
 
-  utils.lsp_nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-  utils.lsp_nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  utils.lsp_nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  utils.lsp_nmap(
-    '<leader>D',
-    require('telescope.builtin').lsp_type_definitions,
-    'Type [D]efinition'
-  )
-  utils.lsp_nmap(
-    '<leader>ds',
-    require('telescope.builtin').lsp_document_symbols,
-    '[D]ocument [S]ymbols'
-  )
-  utils.lsp_nmap(
-    '<leader>ws',
-    require('telescope.builtin').lsp_dynamic_workspace_symbols,
-    '[W]orkspace [S]ymbols'
-  )
+  map('K', vim.lsp.buf.hover, 'Hover Documentation')
+  map('gK', vim.lsp.buf.signature_help, 'Signature Documentation') -- <C-k> is pane navigation
 
-  utils.lsp_nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  utils.lsp_nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-
-  utils.lsp_nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  utils.lsp_nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  utils.lsp_nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  utils.lsp_nmap('<leader>wl', function()
+  map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  map('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+  map('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+  map('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 end
 
+-- Capabilities shared by every server, on top of what blink.cmp advertises
+local capabilities = function()
+  return vim.tbl_deep_extend('force', require('blink.cmp').get_lsp_capabilities({}, true), {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = false,
+      },
+    },
+    textDocument = {
+      foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      },
+      completion = {
+        completionItem = {
+          snippetSupport = false,
+          commitCharactersSupport = false,
+          deprecatedSupport = false,
+          preselectSupport = false,
+        },
+      },
+    },
+  })
+end
+
+-- Servers started through vim.lsp.enable; mason-lspconfig installs any that are missing
+local servers = {
+  'clangd',
+  'gopls',
+  'pyright',
+  'rust_analyzer',
+  'html',
+  'cssls',
+  'lua_ls',
+  'prismals',
+  'jsonls',
+  'yamlls',
+  'bashls',
+  'dockerls',
+  'kotlin_language_server',
+}
+
+-- Non-LSP tools installed through Mason (formatters used by conform)
+local tools = { 'stylua', 'csharpier' }
+
 return {
   {
+    'mason-org/mason.nvim',
+    cmd = 'Mason',
+    opts = {
+      registries = {
+        'github:mason-org/mason-registry',
+        'github:Crashdummyy/mason-registry',
+      },
+    },
+    config = function(_, opts)
+      require('mason').setup(opts)
+      local registry = require 'mason-registry'
+      registry.refresh(function()
+        for _, name in ipairs(tools) do
+          local ok, pkg = pcall(registry.get_package, name)
+          if ok and not pkg:is_installed() then
+            pkg:install()
+          end
+        end
+      end)
+    end,
+  },
+  {
     'neovim/nvim-lspconfig',
+    event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      { 'williamboman/mason.nvim', config = true },
-      'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim',       opts = {} },
-      'folke/neodev.nvim',
-      "iguanacucumber/magazine.nvim",
-      'rachartier/tiny-code-action.nvim',
-      'b0o/schemastore.nvim'
+      'mason-org/mason.nvim',
+      'mason-org/mason-lspconfig.nvim',
+      { 'j-hui/fidget.nvim', opts = {} },
+      'saghen/blink.cmp',
     },
     config = function()
-      setup_lsp_handlers()
-      require('mason').setup({
-        registries = {
-          "github:mason-org/mason-registry",
-          "github:Crashdummyy/mason-registry",
-        }
+      setup_diagnostics()
+
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+        callback = function(event)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client then
+            on_attach(client, event.buf)
+          end
+        end,
       })
-      require('mason-lspconfig').setup()
 
-      -- Setup neovim lua configuration
-      require('neodev').setup()
+      vim.lsp.config('*', { capabilities = capabilities() })
 
-      -- Optimize capabilities
-      local capabilities = vim.tbl_deep_extend(
-        'force',
-        vim.lsp.protocol.make_client_capabilities(),
-        require('cmp_nvim_lsp').default_capabilities(),
-        {
-          workspace = {
-            didChangeWatchedFiles = {
-              dynamicRegistration = false,
-            },
-          },
-          textDocument = {
-            foldingRange = {
-              dynamicRegistration = false,
-              lineFoldingOnly = true,
-            },
-            completion = {
-              completionItem = {
-                snippetSupport = false,
-                commitCharactersSupport = false,
-                deprecatedSupport = false,
-                preselectSupport = false,
-              },
-            },
-          },
-        }
-      )
-
-      -- Configure servers individually with proper initialization
-      local servers_config = {
-        capabilities = capabilities,
-        on_attach = on_attach,
-      }
-
-      -- Use vim.lsp.config for server setup (new API in Neovim 0.11+)
-
-      -- Configure individual servers using vim.lsp.config
-      vim.lsp.config.clangd = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('clangd', {
         cmd = {
           'clangd',
           '--background-index',
           '--clang-tidy',
           '--header-insertion=never',
           '--completion-style=detailed',
-          '--function-arg-placeholders',
+          '--function-arg-placeholders=1',
         },
       })
-      vim.lsp.enable('clangd')
 
-      vim.lsp.config.gopls = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('gopls', {
         settings = {
           gopls = {
             analyses = {
@@ -216,22 +197,18 @@ return {
           },
         },
       })
-      vim.lsp.enable('gopls')
 
-      vim.lsp.config.pyright = servers_config
-      vim.lsp.enable('pyright')
-
-      vim.lsp.config.rust_analyzer = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('rust_analyzer', {
         settings = {
           ['rust-analyzer'] = {
             cargo = {
-              allFeatures = true,
-              loadOutDirsFromCheck = true,
-              runBuildScripts = true,
+              features = 'all',
+              buildScripts = { enable = true },
             },
-            checkOnSave = {
-              allFeatures = true,
+            checkOnSave = true,
+            check = {
               command = 'clippy',
+              features = 'all',
               extraArgs = { '--no-deps' },
             },
             procMacro = {
@@ -245,157 +222,93 @@ return {
           },
         },
       })
-      vim.lsp.enable('rust_analyzer')
 
-      vim.lsp.config.html = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('html', {
         filetypes = { 'html', 'twig', 'hbs' },
       })
-      vim.lsp.enable('html')
 
-      vim.lsp.config.cssls = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('cssls', {
         filetypes = { 'css', 'scss', 'less', 'sass' },
       })
-      vim.lsp.enable('cssls')
 
-      vim.lsp.config.lua_ls = vim.tbl_extend('force', servers_config, {
+      -- Neovim runtime/plugin types come from lazydev.nvim
+      vim.lsp.config('lua_ls', {
         settings = {
           Lua = {
-            workspace = {
-              checkThirdParty = false,
-              library = {
-                '${3rd}/luv/library',
-                unpack(vim.api.nvim_get_runtime_file('', true)),
-              },
-            },
-            completion = {
-              callSnippet = 'Replace',
-            },
+            workspace = { checkThirdParty = false },
+            completion = { callSnippet = 'Replace' },
             telemetry = { enable = false },
             hint = { enable = true },
           },
         },
       })
-      vim.lsp.enable('lua_ls')
 
-      vim.lsp.config.prismals = servers_config
-      vim.lsp.enable('prismals')
-
-      -- Configure additional common LSP servers
-      vim.lsp.config.jsonls = vim.tbl_extend('force', servers_config, {
-        settings = {
-          json = {
-            schemas = require('schemastore').json.schemas(),
-            validate = { enable = true },
-          },
-        },
+      -- SchemaStore's catalog is large; only load it when the server actually starts
+      vim.lsp.config('jsonls', {
+        settings = { json = { validate = { enable = true } } },
+        before_init = function(_, config)
+          config.settings.json.schemas = require('schemastore').json.schemas()
+        end,
       })
-      vim.lsp.enable('jsonls')
 
-      vim.lsp.config.yamlls = vim.tbl_extend('force', servers_config, {
+      vim.lsp.config('yamlls', {
         settings = {
           yaml = {
-            schemaStore = {
-              enable = false,
-              url = '',
-            },
-            schemas = require('schemastore').yaml.schemas(),
+            schemaStore = { enable = false, url = '' },
           },
         },
-      })
-      vim.lsp.enable('yamlls')
-
-      vim.lsp.config.bashls = servers_config
-      vim.lsp.enable('bashls')
-      vim.lsp.config.dockerls = servers_config
-      vim.lsp.enable('dockerls')
-
-      -- Swift LSP configuration (SourceKit-LSP)
-      vim.lsp.config.sourcekit = vim.tbl_extend('force', servers_config, {
-        cmd = { 'sourcekit-lsp' },
-        filetypes = { 'swift', 'c', 'cpp', 'objective-c', 'objective-cpp' },
-        root_dir = function(filename, _)
-          -- Use vim.fs.find for root pattern detection
-          local markers = {'buildServer.json', '*.xcodeproj', '*.xcworkspace', 'Package.swift', 'compile_commands.json', '.git'}
-          local found = vim.fs.find(markers, {
-            path = filename,
-            upward = true,
-            stop = vim.fn.expand('~')
-          })[1]
-          if found then
-            return vim.fs.dirname(found)
-          end
-          -- Fallback to git ancestor or current dir
-          local git_dir = vim.fs.find('.git', {
-            path = filename,
-            upward = true,
-            stop = vim.fn.expand('~')
-          })[1]
-          if git_dir then
-            return vim.fs.dirname(git_dir)
-          end
-          return vim.fs.dirname(filename)
+        before_init = function(_, config)
+          config.settings.yaml.schemas = require('schemastore').yaml.schemas()
         end,
-        capabilities = vim.tbl_deep_extend('force', capabilities, {
-          workspace = {
-            didChangeWatchedFiles = {
-              dynamicRegistration = true,
-            },
-          },
-        }),
-        settings = {},
       })
-      vim.lsp.enable('sourcekit')
 
-      -- Kotlin LSP configuration
-      vim.lsp.config.kotlin_language_server = servers_config
-      vim.lsp.enable('kotlin_language_server')
+      -- SourceKit-LSP (from Xcode) handles Swift/Objective-C; C and C++ stay with clangd
+      vim.lsp.config('sourcekit', {
+        filetypes = { 'swift', 'objc', 'objcpp' },
+      })
 
-      -- Enable servers using mason-lspconfig
-      local servers = {
-        'clangd', 'gopls', 'pyright', 'rust_analyzer',
-        'html', 'cssls', 'lua_ls', 'prismals',
-        'jsonls', 'yamlls', 'bashls', 'dockerls',
-        'kotlin_language_server'
-      }
-
-      local mason_lspconfig = require 'mason-lspconfig'
-      mason_lspconfig.setup {
+      require('mason-lspconfig').setup {
         ensure_installed = servers,
+        automatic_enable = false, -- enabled explicitly below; roslyn/ts are handled by their plugins
       }
-
-      -- Set up autocmd for LSP attach to ensure keymaps are registered
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
-        callback = function(event)
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client then
-            on_attach(client, event.buf)
-          end
-        end,
-      })
+      vim.lsp.enable(servers)
+      vim.lsp.enable 'sourcekit'
     end,
+  },
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+  {
+    'b0o/schemastore.nvim',
+    lazy = true,
   },
   {
     'seblyng/roslyn.nvim',
     ft = 'cs',
-    opts = {
-      config = {
-        on_attach = on_attach,
-        capabilities = capabilities,
+    init = function()
+      vim.lsp.config('roslyn', {
         settings = {
-          ["csharp|background_analysis"] = {
-            dotnet_analyzer_diagnostics_scope = "openFiles",
-            dotnet_compiler_diagnostics_scope = "fullSolution",
+          ['csharp|background_analysis'] = {
+            dotnet_analyzer_diagnostics_scope = 'openFiles',
+            dotnet_compiler_diagnostics_scope = 'fullSolution',
           },
-          ["csharp|inlay_hints"] = {
+          ['csharp|inlay_hints'] = {
             csharp_enable_inlay_hints_for_implicit_object_creation = true,
             csharp_enable_inlay_hints_for_implicit_variable_types = true,
           },
-          ["csharp|code_lens"] = {
+          ['csharp|code_lens'] = {
             dotnet_enable_references_code_lens = true,
           },
         },
-      },
+      })
+    end,
+    opts = {
       filewatching = 'auto',
       broad_search = false,
       lock_target = false,
@@ -406,9 +319,8 @@ return {
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
     ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
     config = function()
-      require('typescript-tools').setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
+      require('typescript-tools').setup {
+        capabilities = capabilities(),
         settings = {
           separate_diagnostic_server = true,
           publish_diagnostic_on = 'insert_leave',
@@ -428,7 +340,7 @@ return {
             includeInlayEnumMemberValueHints = false,
           },
         },
-      })
+      }
     end,
   },
   {
@@ -437,9 +349,7 @@ return {
       { 'nvim-lua/plenary.nvim' },
       { 'nvim-telescope/telescope.nvim' },
     },
-    event = 'LspAttach',
-    config = function()
-      require('tiny-code-action').setup({});
-    end,
+    lazy = true,
+    opts = {},
   },
 }

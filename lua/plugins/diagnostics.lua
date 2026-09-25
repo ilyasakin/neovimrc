@@ -1,43 +1,31 @@
 return {
   {
     'folke/trouble.nvim',
-    event = 'VeryLazy',
+    cmd = 'Trouble',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     keys = {
       {
         '<leader>tt',
-        ':TroubleToggle<CR>',
-        mode = 'n',
+        '<cmd>Trouble diagnostics toggle<cr>',
         desc = 'Toggle [T]rouble',
       },
     },
     opts = {},
   },
- 
- {
-    enabled = false,
-    "ALVAROPING1/neodim",
-    branch = "fix-nvim-0.11",
-    event = "LspAttach",
-    config = function()
-      require("neodim").setup()
-    end,
-  },
 
   {
-	  'dgagn/diagflow.nvim',
-	  event = 'LspAttach',
-	  opts = {},
+    'dgagn/diagflow.nvim',
+    event = 'LspAttach',
+    opts = {},
   },
 
   {
     'dmmulroy/tsc.nvim',
+    cmd = 'TSC',
     dependencies = { 'folke/trouble.nvim' },
-    opts =
-    {
+    opts = {
       run_as_monorepo = true,
       use_trouble_qflist = true,
-    }
-  }
-
+    },
+  },
 }

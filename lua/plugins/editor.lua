@@ -18,14 +18,14 @@ return {
   },
 
   {
-    'LunarVim/bigfile.nvim',
-    event = 'VeryLazy',
-  },
-
-  {
-    'f-person/git-blame.nvim',
-    event = 'VeryLazy',
-    opts = {}, -- this is equalent to setup({}) function
+    -- bigfile: turns off LSP/treesitter/etc. on huge files (replaces bigfile.nvim).
+    -- Also provides the terminal used by claudecode.nvim.
+    'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
+    opts = {
+      bigfile = { enabled = true },
+    },
   },
 
   {

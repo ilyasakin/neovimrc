@@ -1,21 +1,13 @@
 local M = {}
-local wk = require 'which-key'
 
+-- which-key picks up `desc` from regular keymaps, so no need to go through wk.add
 function M.map(mode, keys, func, desc, opts)
   opts = opts or {}
-  opts.silent = opts.silent ~= false
-  opts.desc = desc
-  opts.remap = opts.noremap == false
-
-  wk.add({
-    {
-      keys,
-      func,
-      buffer = opts.buffer,
-      desc = desc,
-      remap = opts.remap,
-      mode = mode,
-    }
+  vim.keymap.set(mode, keys, func, {
+    buffer = opts.buffer,
+    desc = desc,
+    silent = opts.silent ~= false,
+    remap = opts.noremap == false,
   })
 end
 
@@ -69,7 +61,7 @@ function M.safe_require(module)
 end
 
 function M.is_windows()
-  return vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1
+  return vim.fn.has 'win32' == 1 or vim.fn.has 'win64' == 1
 end
 
 function M.get_os_command(commands)

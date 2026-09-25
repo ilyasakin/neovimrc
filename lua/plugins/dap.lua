@@ -70,6 +70,10 @@ return {
       local dap = require 'dap'
       local ui = require 'dapui'
 
+      -- Highlighting in the REPL buffer (dap_repl treesitter parser)
+      require('nvim-dap-repl-highlights').setup()
+      require('nvim-dap-virtual-text').setup {}
+
       dap.listeners.before.attach.dapui_config = function()
         ui.open()
       end
@@ -129,11 +133,10 @@ return {
     -- Only load when nvim-dap loads
     lazy = true,
     dependencies = {
-      'williamboman/mason.nvim',
+      'mason-org/mason.nvim',
       'mfussenegger/nvim-dap',
     },
     opts = {
-      ensure_installed = { 'stylua', 'jq' },
       handlers = {
         function(config)
           -- all sources with no handler get passed here

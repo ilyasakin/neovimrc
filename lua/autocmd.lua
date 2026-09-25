@@ -11,12 +11,11 @@ local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = t
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
   group = highlight_group,
   pattern = '*',
 })
-
 
 -- Auto-reload buffers when files change externally
 local autoread_group = vim.api.nvim_create_augroup('AutoRead', { clear = true })
@@ -26,7 +25,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
   pattern = '*',
   callback = function()
     if vim.fn.mode() ~= 'c' then
-      vim.cmd('checktime')
+      vim.cmd 'checktime'
     end
   end,
   desc = 'Check for file changes when focus is gained or cursor is held',

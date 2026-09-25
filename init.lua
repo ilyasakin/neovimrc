@@ -1,48 +1,48 @@
+-- Cache compiled Lua modules; must run before anything is required
+vim.loader.enable()
+
 -- [[ Setting options ]]
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 vim.o.hlsearch = true
-vim.wo.number = true
+vim.o.number = true
+vim.o.relativenumber = true
 vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
 vim.o.breakindent = true
 vim.o.undofile = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
-vim.wo.signcolumn = 'yes'
+vim.o.signcolumn = 'yes'
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
-vim.o.lazyredraw = true
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-vim.wo.relativenumber = true
-vim.g.do_filetype_lua = 1
-vim.opt.swapfile = false
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-vim.opt.backup = false
-vim.opt.wrap = false
-vim.opt.guicursor = ''
-vim.opt.scrolloff = 4
-vim.opt.diffopt = vim.opt.diffopt + 'linematch:50'
-vim.opt.conceallevel = 2
-vim.opt.hidden = true
-vim.opt.history = 100
-vim.opt.synmaxcol = 240
+vim.o.swapfile = false
+vim.o.splitright = true
+vim.o.splitbelow = true
+vim.o.backup = false
+vim.o.wrap = false
+vim.o.guicursor = ''
+vim.o.scrolloff = 4
+vim.opt.diffopt:append 'linematch:50'
+vim.o.conceallevel = 2
+vim.o.history = 100
+vim.o.synmaxcol = 240
 vim.g.did_install_default_menus = 1
 vim.g.did_install_syntax_menu = 1
 
 -- Auto-reload buffers when files change
-vim.opt.autoread = true
-
-vim.loader.enable()
+vim.o.autoread = true
 
 -- Disable unused providers
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
 
 -- Set Python provider to use our virtual environment
-vim.g.python3_host_prog = vim.fn.expand('~/.config/nvim/venv/bin/python3')
+vim.g.python3_host_prog = vim.fn.expand '~/.config/nvim/venv/bin/python3'
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -78,7 +78,18 @@ require('lazy').setup({
   -- require 'plugins.codex',
   require 'plugins.venv-selector',
   require 'plugins.zen-mode',
-}, {})
+  require 'plugins.tmux-navigator',
+}, {
+  install = { colorscheme = { 'catppuccin' } },
+  rocks = { enabled = false }, -- no plugin needs luarocks
+  change_detection = { notify = false },
+  performance = {
+    rtp = {
+      -- Built-in runtime plugins that are never used. netrw stays: <leader>e and claudecode use it.
+      disabled_plugins = { 'gzip', 'tarPlugin', 'tohtml', 'tutor', 'zipPlugin' },
+    },
+  },
+})
 
 require 'remap'
 require 'keymap'
