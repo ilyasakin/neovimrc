@@ -43,7 +43,7 @@ vim.keymap.set('n', '<leader>e', ':Ex<CR>', { desc = 'Open [E]xplorer' })
 
 local quickCommit = function()
   local keys = vim.api.nvim_replace_termcodes(':Git commit -m ""<Left>', false, false, true)
-  vim.api.nvim_feedkeys(keys, 'n', {})
+  vim.api.nvim_feedkeys(keys, 'n', false)
 end
 
 local quickCommitWithBranch = function()
@@ -58,7 +58,7 @@ local quickCommitWithBranch = function()
 
   local str = ':Git commit -m "' .. branch.stdout .. ' "<Left>'
   local keys = vim.api.nvim_replace_termcodes(str, true, true, true)
-  vim.api.nvim_feedkeys(keys, 'n', {})
+  vim.api.nvim_feedkeys(keys, 'n', false)
 end
 
 vim.keymap.set('n', '<leader>qc', quickCommit, { desc = 'Quick [C]ommit' })
